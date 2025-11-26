@@ -14,14 +14,14 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function PerfilPage() {
-    const { usuarioActual, obtenerBeneficioUsuario } = useAuth();
+    const { usuarioActual } = useAuth();
 
     if (!usuarioActual) {
         // si no hay sesión, mandar al login
         return <Navigate to="/login" replace />;
     }
 
-    const beneficio = obtenerBeneficioUsuario(usuarioActual);
+    // Beneficios eliminados
 
     return (
         <section id="perfil" className="section active">
@@ -29,7 +29,7 @@ export default function PerfilPage() {
                 <div className="section-header">
                     <h2 className="section-title">Mi Perfil</h2>
                     <p className="section-subtitle">
-                        Aquí puedes ver tus datos básicos y tus beneficios como cliente.
+                        Aquí puedes ver tus datos básicos.
                     </p>
                 </div>
 
@@ -46,11 +46,7 @@ export default function PerfilPage() {
                         </div>
                     </div>
 
-                    {beneficio && (
-                        <div className="profile-benefit">
-                            <i className="fas fa-gift" /> {beneficio}
-                        </div>
-                    )}
+                    {/* Beneficios eliminados */}
 
                     <div className="profile-details">
                         <p>

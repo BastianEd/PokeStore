@@ -36,11 +36,11 @@ export function useCurrentUser() {
 
         const handler = () => sync();
         window.addEventListener("storage", handler);
-        window.addEventListener("usuario_actual_mil_sabores_changed", handler);
+        window.addEventListener("usuario_actual_pokestore_changed", handler);
 
         return () => {
             window.removeEventListener("storage", handler);
-            window.removeEventListener("usuario_actual_mil_sabores_changed", handler);
+            window.removeEventListener("usuario_actual_pokestore_changed", handler);
         };
     }, []);
 
@@ -55,7 +55,7 @@ export function UserProfile() {
     const handleLogout = () => {
         if (typeof window === "undefined") return;
         window.localStorage.removeItem(CURRENT_USER_KEY);
-        window.dispatchEvent(new Event("usuario_actual_mil_sabores_changed"));
+        window.dispatchEvent(new Event("usuario_actual_pokestore_changed"));
         window.location.href = "/login";
     };
 

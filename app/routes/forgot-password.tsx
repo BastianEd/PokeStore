@@ -13,10 +13,10 @@ type StoredUser = {
 
 export function meta({}: Route.MetaArgs) {
     return [
-        { title: "Recuperar contraseña - Pastelería Mil Sabores" },
+        { title: "Recuperar contraseña - PokeStore" },
         {
             name: "description",
-            content: "Recupera el acceso a tu cuenta de Pastelería Mil Sabores.",
+            content: "Recupera el acceso a tu cuenta de PokeStore.",
         },
     ];
 }

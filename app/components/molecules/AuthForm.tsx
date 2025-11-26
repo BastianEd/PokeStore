@@ -6,7 +6,7 @@ import {
 } from "react";
 import { Link, useNavigate } from "react-router";
 
-type UsuarioTipo = "mayor" | "estudiante" | "regular";
+type UsuarioTipo = "regular";
 
 type Usuario = {
     email: string;
@@ -14,13 +14,11 @@ type Usuario = {
     tipo: UsuarioTipo;
 };
 
-const STORAGE_KEY = "usuarios_mil_sabores";
-const CURRENT_KEY = "usuario_actual_mil_sabores";
+const STORAGE_KEY = "usuarios_pokestore";
+const CURRENT_KEY = "usuario_actual_pokestore";
 
 const DEMO_USERS: Usuario[] = [
-    { email: "mayor@gmail.com",      password: "password123", tipo: "mayor" },
-    { email: "estudiante@duoc.cl",   password: "password123", tipo: "estudiante" },
-    { email: "usuario@gmail.com",    password: "password123", tipo: "regular" },
+    { email: "usuario@gmail.com", password: "password123", tipo: "regular" },
 ];
 
 // --- helpers de localStorage ---
@@ -106,13 +104,10 @@ export function AuthForm({ mode }: AuthFormProps) {
                 JSON.stringify({ email: usuario.email, tipo: usuario.tipo }),
             );
             // avisar al header que cambió el usuario
-            window.dispatchEvent(
-                new Event("usuario_actual_mil_sabores_changed"),
-            );
+            window.dispatchEvent(new Event("usuario_actual_pokestore_changed"));
 
             setSuccess("Inicio de sesión exitoso 😎");
 
-            // 👇 importante: home es la raíz "/"
             navigate("/");
         } else {
             // ---- REGISTRO ----
@@ -137,9 +132,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 CURRENT_KEY,
                 JSON.stringify({ email: nuevo.email, tipo: nuevo.tipo }),
             );
-            window.dispatchEvent(
-                new Event("usuario_actual_mil_sabores_changed"),
-            );
+            window.dispatchEvent(new Event("usuario_actual_pokestore_changed"));
 
             setSuccess("Registro exitoso. Te hemos iniciado sesión automáticamente 🎉");
             navigate("/");
@@ -152,12 +145,12 @@ export function AuthForm({ mode }: AuthFormProps) {
                 {/* Panel principal */}
                 <div className="auth-card">
                     <h2 className="section-title">
-                        {isLogin ? "Iniciar Sesión" : "Registro de Usuario"}
+                        {isLogin ? "Iniciar Sesión - PokeStore" : "Registro - PokeStore"}
                     </h2>
                     <p className="auth-subtitle">
                         {isLogin
-                            ? "Ingresa con tu correo y contraseña para ver tus descuentos y pedidos."
-                            : "Crea tu cuenta para acceder a beneficios y descuentos exclusivos."}
+                            ? "Ingresa con tu correo y contraseña para acceder a tu cuenta."
+                            : "Crea tu cuenta para comenzar a comprar en PokeStore."}
                     </p>
 
                     <form className="auth-form" onSubmit={handleSubmit}>
@@ -183,19 +176,6 @@ export function AuthForm({ mode }: AuthFormProps) {
                             />
                         </label>
 
-                        {!isLogin && (
-                            <label className="form-field">
-                                <span>Tipo de usuario</span>
-                                <select
-                                    value={tipo}
-                                    onChange={(e) => setTipo(e.target.value as UsuarioTipo)}
-                                >
-                                    <option value="mayor">Usuario Mayor</option>
-                                    <option value="estudiante">Estudiante Duoc</option>
-                                    <option value="regular">Usuario Regular</option>
-                                </select>
-                            </label>
-                        )}
 
                         {error && <p className="form-error">{error}</p>}
                         {success && <p className="form-success">{success}</p>}
@@ -224,30 +204,6 @@ export function AuthForm({ mode }: AuthFormProps) {
                     </form>
                 </div>
 
-                {/* Lado derecho: usuarios demo / info extra */}
-                <aside className="auth-side">
-                    <div className="demo-users">
-                        <h4>👥 Usuarios de Prueba:</h4>
-
-                        <div className="demo-user">
-                            <strong>Usuario Mayor:</strong> mayor@gmail.com / password123
-                            <br />
-                            <small>Recibe 50% descuento por edad</small>
-                        </div>
-
-                        <div className="demo-user">
-                            <strong>Estudiante Duoc:</strong> estudiante@duoc.cl / password123
-                            <br />
-                            <small>Torta gratis en cumpleaños</small>
-                        </div>
-
-                        <div className="demo-user">
-                            <strong>Usuario Regular:</strong> usuario@gmail.com / password123
-                            <br />
-                            <small>Descuentos aplicables con códigos</small>
-                        </div>
-                    </div>
-                </aside>
             </div>
         </section>
     );

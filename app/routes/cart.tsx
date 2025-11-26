@@ -1,6 +1,7 @@
 // app/routes/cart.tsx
 import type { Route } from "./+types/cart";
 import { useCart } from "~/services/cart-context";
+import { useNotification } from "~/services/notification-context";
 
 export function meta({}: Route.MetaArgs) {
     return [{ title: "Carrito de Captura - Pokémon Trading Co." }];
@@ -8,6 +9,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function CartPage() {
     const { items, totalItems, totalPrice, removeFromCart, clearCart } = useCart();
+    const { showNotification } = useNotification();
 
     if (totalItems === 0) {
         return (
@@ -27,7 +29,7 @@ export default function CartPage() {
 
                 <div className="cart-grid">
                     {items.map((item) => (
-                        <article key={item.codigo} className="cart-item">
+                        <article key={item.pokedexId} className="cart-item">
                             <img
                                 src={item.imagen}
                                 alt={item.nombre}
@@ -38,13 +40,13 @@ export default function CartPage() {
                                 <h3>{item.nombre}</h3>
                                 {/* Se asume que item ahora tiene 'tipoPrincipal' */}
                                 <p>Tipo: {item.tipoPrincipal}</p> 
-                                <p>Cantidad (Pokeballs): {item.quantity}</p>
-                                <p>Precio unidad: ${item.precio}</p>
-                                <p>Subtotal: ${item.precio * item.quantity}</p>
+                                <p>Cantidad: {item.quantity}</p>
+                                <p>Precio unidad: {new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(item.precio)}</p>
+                                <p>Subtotal: {new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(item.precio * item.quantity)}</p>
 
                                 <button
                                     className="btn-secondary"
-                                    onClick={() => removeFromCart(item.codigo)}
+                                    onClick={() => removeFromCart(item.pokedexId)}
                                 >
                                     Liberar Pokémon
                                 </button>
@@ -55,10 +57,21 @@ export default function CartPage() {
 
                 <div className="cart-summary">
                     <p>Total Pokémon en el Equipo: {totalItems}</p>
-                    <p>Total a pagar: ${totalPrice}</p>
-                    <button className="btn-primary" onClick={clearCart}>
-                        Liberar Equipo
-                    </button>
+                    <p>Total a pagar: {new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(totalPrice)}</p>
+                    <div style={{ display: "flex", gap: "12px" }}>
+                        <button className="btn-secondary" onClick={clearCart}>
+                            Liberar Equipo
+                        </button>
+                        <button
+                            className="btn-primary"
+                            onClick={() => {
+                                showNotification("¡Compra realizada! Tus Pokémon ya son tuyos.");
+                                clearCart();
+                            }}
+                        >
+                            Comprar
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>

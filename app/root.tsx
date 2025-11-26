@@ -51,7 +51,7 @@ function Shell({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        // APLICAMOS LA CLASE 'menu-open' AL CONTENEDOR PRINCIPAL
+        // Contenedor principal con layout de columna para mantener el footer abajo
         <div id="app-wrapper" className={isMenuOpen ? "menu-open" : ""} onClick={(e) => {
             // Cerrar menú si se hace click en el overlay
             if (e.target === e.currentTarget && isMenuOpen) {
@@ -135,8 +135,9 @@ function Shell({ children }: { children: React.ReactNode }) {
                     )}
                 </ul>
             </header>
-
-            {children}
+            <main className="main-content">
+                {children}
+            </main>
 
             <footer className="footer">
                 <div className="container">

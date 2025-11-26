@@ -19,7 +19,7 @@ interface CartContextValue {
     totalPrice: number;
     // Se cambia el tipo de dato esperado
     addToCart: (pokemon: Pokemon) => void; 
-    removeFromCart: (codigo: string) => void;
+    removeFromCart: (pokedexId: number) => void;
     clearCart: () => void;
 }
 
@@ -46,8 +46,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Se actualiza el parámetro
     const addToCart = (pokemon: Pokemon) => {
         setItems((prev) => {
-            // El codigo del producto ahora es el pokedexId o el codigo original. 
-            // Usaré 'codigo' como key genérica, asumiendo que es el nombre interno único.
             const existing = prev.find((i) => i.pokedexId === pokemon.pokedexId);
             if (existing) {
                 return prev.map((i) =>
@@ -56,16 +54,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
                         : i,
                 );
             }
-            // Agregamos pokedexId para el tracking, si existe. Usando codigo como fallback.
-            const itemKey = (pokemon as any).codigo || pokemon.pokedexId.toString(); 
-
-            return [...prev, { ...pokemon, pokedexId: itemKey, quantity: 1 }];
+            return [...prev, { ...pokemon, quantity: 1 }];
         });
     };
 
-    // Usaremos el codigo o pokedexId para remover, asumiendo que pokedexId es más consistente con el tema.
-    const removeFromCart = (pokedexId: string) => {
-        setItems((prev) => prev.filter((i) => i.pokedexId.toString() !== pokedexId));
+    const removeFromCart = (pokedexId: number) => {
+        setItems((prev) => prev.filter((i) => i.pokedexId !== pokedexId));
     };
 
     const clearCart = () => setItems([]);

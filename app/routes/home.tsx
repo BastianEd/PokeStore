@@ -72,12 +72,18 @@ export default function Home() {
                             </Link>
                         </div>
 
-                        {/* El contenedor .anniversary-badge y su contenido ahora son gestionados por el CSS para la estética de Pokeball. */}
+                        {/* Imagen Pokéball en el hero */}
                         <div className="hero-image">
-                            <div className="anniversary-badge">
-                                <div className="anniversary-number">{POKE_TRADING_CO.aniversario}</div>
-                                <div className="anniversary-text">años en el mercado</div>
-                            </div>
+                            <img
+                                src={new URL("../assets/img/pokeball.png", import.meta.url).href}
+                                alt="Pokéball"
+                                style={{
+                                    maxWidth: "85%",
+                                    maxHeight: "360px",
+                                    objectFit: "contain",
+                                    filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.25))"
+                                }}
+                            />
                         </div>
                     </div>
                 </div>
@@ -93,27 +99,6 @@ export default function Home() {
                             onView={handleViewPokemon}
                         />
                     ))}
-                </div>
-            </div>
-
-            <div className="company-info">
-                <div className="container">
-                    <div className="info-grid">
-                        <div className="info-card">
-                            <h4>Nuestra Misión</h4>
-                            <p>{POKE_TRADING_CO.mision}</p>
-                        </div>
-                        <div className="info-card">
-                            <h4>Nuestra Visión</h4>
-                            <p>{POKE_TRADING_CO.vision}</p>
-                        </div>
-                        <div className="info-card">
-                            <h4>La Historia de la Compañía</h4>
-                            <p>
-                                Fundada al inicio de la Liga Pokémon, hemos evolucionado de un pequeño centro de intercambio a la tienda de confianza de los Grandes Maestros.
-                            </p>
-                        </div>
-                    </div>
                 </div>
             </div>
 

@@ -34,7 +34,6 @@ interface AuthContextValue extends AuthState {
         password: string;
         fechaNacimiento?: string;
     }) => void;
-    obtenerBeneficioUsuario: (user?: Usuario | null) => string | null;
 }
 
 const DEMO_USERS: Usuario[] = [
@@ -168,23 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }));
     };
 
-    const obtenerBeneficioUsuario: AuthContextValue["obtenerBeneficioUsuario"] = (
-        user,
-    ) => {
-        const u = user ?? state.usuarioActual;
-        if (!u) return null;
-
-        switch (u.tipoUsuario) {
-            case "mayor":
-                return "Usuario Mayor · 50% de descuento por edad";
-            case "estudiante_duoc":
-                return "Estudiante Duoc · Torta de cumpleaños gratis";
-            case "regular":
-                return "Usuario Regular · Descuentos con códigos y promociones";
-            default:
-                return null;
-        }
-    };
+    // Beneficios eliminados: ya no se calculan beneficios por tipo de usuario.
 
     return (
         <AuthContext.Provider
@@ -193,7 +176,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 login,
                 logout,
                 register,
-                obtenerBeneficioUsuario,
             }}
         >
             {children}
