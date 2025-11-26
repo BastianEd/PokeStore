@@ -36,7 +36,8 @@ export const links: Route.LinksFunction = () => [
 
 function Shell({ children }: { children: React.ReactNode }) {
     const { usuarioActual, logout } = useAuth();
-    const [isMenuOpen, setIsMenuOpen] = useState(false); 
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
     const handleToggleMenu = () => {
         setIsMenuOpen(prev => !prev);
@@ -44,6 +45,7 @@ function Shell({ children }: { children: React.ReactNode }) {
     
     const handleNavLinkClick = () => {
         setIsMenuOpen(false);
+        setIsProfileMenuOpen(false);
     };
 
     const handleOverlayClick = () => {
@@ -98,16 +100,28 @@ function Shell({ children }: { children: React.ReactNode }) {
                         <div className="nav-actions">
                             {usuarioActual ? (
                                 <>
-                                    <NavLink 
-                                        to="/perfil" 
-                                        className="profile-pill" 
-                                        title="Ver perfil"
-                                        onClick={handleNavLinkClick}
-                                    >
-                                        <i className="fas fa-user" />
-                                        <span className="profile-name">{usuarioActual.nombre || usuarioActual.email}</span>
-                                    </NavLink>
-                                    <button type="button" className="btn-link" onClick={logout} style={{ marginRight: "0.75rem" }}>Cerrar sesión</button>
+                                    <div className="profile-menu-wrapper">
+                                        <button
+                                            type="button"
+                                            className={"profile-pill" + (isProfileMenuOpen ? " active" : "")}
+                                            title="Menú de perfil"
+                                            onClick={() => setIsProfileMenuOpen((v) => !v)}
+                                        >
+                                            <i className="fas fa-user" />
+                                            <span className="profile-name">{usuarioActual.nombre || usuarioActual.email}</span>
+                                            <i className="fas fa-chevron-down" style={{ marginLeft: "6px", fontSize: "0.85rem" }} />
+                                        </button>
+                                        {isProfileMenuOpen && (
+                                            <div className="profile-dropdown">
+                                                <NavLink to="/perfil" className="profile-dropdown-item" onClick={handleNavLinkClick}>
+                                                    <i className="fas fa-id-card" /> Mi Perfil
+                                                </NavLink>
+                                                <button type="button" className="profile-dropdown-item" onClick={() => { setIsProfileMenuOpen(false); logout(); }}>
+                                                    <i className="fas fa-sign-out-alt" /> Cerrar sesión
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </>
                             ) : (
                                 <div className="user-info" style={{ display: "none" }} />

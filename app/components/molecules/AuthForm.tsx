@@ -17,41 +17,26 @@ type Usuario = {
 const STORAGE_KEY = "usuarios_pokestore";
 const CURRENT_KEY = "usuario_actual_pokestore";
 
-const DEMO_USERS: Usuario[] = [
-    { email: "usuario@gmail.com", password: "password123", tipo: "regular" },
-];
+const DEMO_USERS: Usuario[] = [];
 
 // --- helpers de localStorage ---
 
 function leerUsuarios(): Usuario[] {
-    if (typeof window === "undefined") return DEMO_USERS;
+    if (typeof window === "undefined") return [];
 
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-        // si no hay nada, inicializamos con los demos
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(DEMO_USERS));
-        return DEMO_USERS;
+        // sin seeding: comenzamos vacíos
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+        return [];
     }
 
     try {
         const guardados = JSON.parse(raw) as Usuario[];
-
-        // nos aseguramos de que los demo estén presentes
-        const mezclados = [...guardados];
-        for (const demo of DEMO_USERS) {
-            if (!mezclados.some((u) => u.email === demo.email)) {
-                mezclados.push(demo);
-            }
-        }
-
-        if (mezclados.length !== guardados.length) {
-            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(mezclados));
-        }
-
-        return mezclados;
+        return Array.isArray(guardados) ? guardados : [];
     } catch {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(DEMO_USERS));
-        return DEMO_USERS;
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+        return [];
     }
 }
 

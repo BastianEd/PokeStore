@@ -36,56 +36,26 @@ interface AuthContextValue extends AuthState {
     }) => void;
 }
 
-const DEMO_USERS: Usuario[] = [
-    {
-        id: "demo-mayor",
-        nombre: "Usuario Mayor",
-        email: "mayor@gmail.com",
-        password: "password123",
-        tipoUsuario: "mayor",
-        fechaNacimiento: "1950-01-01",
-    },
-    {
-        id: "demo-estudiante",
-        nombre: "Estudiante Duoc",
-        email: "estudiante@duoc.cl",
-        password: "password123",
-        tipoUsuario: "estudiante_duoc",
-        fechaNacimiento: "2000-01-01",
-    },
-    {
-        id: "demo-regular",
-        nombre: "Usuario Regular",
-        email: "usuario@gmail.com",
-        password: "password123",
-        tipoUsuario: "regular",
-        fechaNacimiento: "1995-01-01",
-    },
-];
+const DEMO_USERS: Usuario[] = [];
 
 function cargarEstadoInicial(): AuthState {
     if (typeof window === "undefined") {
-        return { usuarios: DEMO_USERS, usuarioActual: null };
+        return { usuarios: [], usuarioActual: null };
     }
 
     try {
         const raw = window.localStorage.getItem(STORAGE_KEY);
         if (!raw) {
-            return { usuarios: DEMO_USERS, usuarioActual: null };
+            return { usuarios: [], usuarioActual: null };
         }
         const parsed = JSON.parse(raw) as AuthState;
 
-        // Por si acaso nunca se guardaron los demo
-        const correosExistentes = new Set(parsed.usuarios.map((u) => u.email));
-        const faltantes = DEMO_USERS.filter(
-            (d) => !correosExistentes.has(d.email),
-        );
         return {
-            usuarios: [...parsed.usuarios, ...faltantes],
+            usuarios: parsed.usuarios ?? [],
             usuarioActual: parsed.usuarioActual ?? null,
         };
     } catch {
-        return { usuarios: DEMO_USERS, usuarioActual: null };
+        return { usuarios: [], usuarioActual: null };
     }
 }
 
