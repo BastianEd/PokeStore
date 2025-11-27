@@ -42,7 +42,6 @@ export const POKEMONS: Pokemon[] = [
         precio: 48000,
         descripcion: "Pokémon tipo Planta/Veneno. Lleva una semilla en su espalda que crece con él.",
         imagen: "app/assets/img/Bulbasaur.png",
-        destacado: true
     },
     {
         pokedexId: 143,

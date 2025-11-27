@@ -101,7 +101,7 @@ function Shell({ children }: { children: React.ReactNode }) {
                                 type="text"
                                 className="product-search"
                                 placeholder="Buscar Charizard, Pokeballs, Guías..."
-                                arialabel="Buscar"
+                                aria-label="Buscar"
                                 value={searchText}
                                 onChange={(e) => {
                                     const val = e.target.value;
