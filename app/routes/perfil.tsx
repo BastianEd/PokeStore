@@ -4,10 +4,10 @@ import { useAuth } from "~/services/auth-context";
 
 export function meta({}: Route.MetaArgs) {
     return [
-        { title: "Mi Perfil - Pastelería Mil Sabores" },
+        { title: "Mi Perfil - PokeStore" },
         {
             name: "description",
-            content: "Perfil del usuario y beneficios en Pastelería Mil Sabores.",
+            content: "Perfil del entrenador en PokeStore",
         },
     ];
 }

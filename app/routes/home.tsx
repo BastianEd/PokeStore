@@ -8,12 +8,12 @@ import { Link } from "react-router";
 export function meta({}: Route.MetaArgs) {
     return [
         {
-            title: "Pokémon Trading Co. - ¡Atrápalos, Entrénalos y Véndelos!",
+            title: "PokeStore - ¡Atrápalos y Entrénalos!",
         },
         {
             name: "description",
             content:
-                "Pokémon Trading Co. - La mejor plataforma para adquirir, entrenar y vender Pokémon.",
+                "PokeStore - La mejor plataforma para adquirir, entrenar Pokemon.",
         },
     ];
 }

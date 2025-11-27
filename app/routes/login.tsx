@@ -107,27 +107,6 @@ export default function LoginPage() {
                         </ul>
                     </aside>
                 </div>
-
-                <div className="demo-users">
-                    <h4>👥 Cuentas de Prueba:</h4>
-                    <div className="demo-user">
-                        <strong>Profesor Pokémon:</strong> mayor@gmail.com / password123
-                        <br />
-                        <small>Recibe 50% de descuento en Pokeballs</small>
-                    </div>
-
-                    <div className="demo-user">
-                        <strong>Aspirante a Maestro:</strong> estudiante@duoc.cl / password123
-                        <br />
-                        <small>Pokémon Inicial de Regalo</small>
-                    </div>
-
-                    <div className="demo-user">
-                        <strong>Entrenador Regular:</strong> usuario@gmail.com / password123
-                        <br />
-                        <small>Descuentos aplicables con códigos de Liga</small>
-                    </div>
-                </div>
             </div>
         </section>
     );
