@@ -1,6 +1,5 @@
 import type { Route } from "./+types/home";
 import { useState } from "react";
-// Importar la data Pokémon
 import { POKEMONS, POKE_TRADING_CO, type Pokemon } from "~/data/products"; 
 import { ProductCard } from "~/components/molecules/ProductCard";
 import { ProductModal } from "~/components/organisms/ProductModal";

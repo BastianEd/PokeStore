@@ -1,5 +1,4 @@
 import type { FC } from "react";
-// Se asume que app/data/products.ts ha sido actualizado con la interfaz Pokemon
 import type { Pokemon } from "~/data/products";
 import { useCart } from "~/services/cart-context";
 import { useNotification } from "~/services/notification-context";

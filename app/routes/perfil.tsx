@@ -1,4 +1,3 @@
-// app/routes/perfil.tsx
 import type { Route } from "./+types/perfil";
 import { Navigate } from "react-router";
 import { useAuth } from "~/services/auth-context";
@@ -21,7 +20,6 @@ export default function PerfilPage() {
         return <Navigate to="/login" replace />;
     }
 
-    // Beneficios eliminados
 
     return (
         <section id="perfil" className="section active">
@@ -46,7 +44,6 @@ export default function PerfilPage() {
                         </div>
                     </div>
 
-                    {/* Beneficios eliminados */}
 
                     <div className="profile-details">
                         <p>
@@ -60,11 +57,35 @@ export default function PerfilPage() {
                         )}
                     </div>
 
-                    <p className="profile-note">
-                        Muy pronto podrás ver aquí tu historial de pedidos y tortas
-                        favoritas. 🍰
-                    </p>
                 </div>
+
+                {usuarioActual.compras && usuarioActual.compras.length > 0 ? (
+                    <div className="mt-lg">
+                        <h4 className="section-subtitle">Tus Pokémon comprados</h4>
+                        <div className="profile-pokemon-grid full-width-grid">
+                            {usuarioActual.compras.map((c) => (
+                                <div key={`${c.pokedexId}-${c.nombre}-${Math.random()}`} className="profile-pokemon-item">
+                                    <div className="profile-pokemon-image">
+                                        <img src={c.imagen} alt={c.nombre} className="img-no-white" />
+                                    </div>
+                                    <div className="profile-pokemon-meta">
+                                        <div className="profile-pokemon-id">N.º {String(c.pokedexId).padStart(4, '0')}</div>
+                                        <h3 className="profile-pokemon-name">{c.nombre}</h3>
+                                        <div className="profile-pokemon-tags">
+                                            <span className="tag type">{c.tipoPrincipal}</span>
+                                            <span className="tag qty">x{c.quantity}</span>
+                                            <span className="tag price">
+                                                {new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(c.precio)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <p className="profile-note">Aún no has comprado Pokémon. ¡Explora la Pokédex y atrápalos! ⚡️</p>
+                )}
             </div>
         </section>
     );

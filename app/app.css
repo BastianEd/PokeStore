@@ -468,6 +468,74 @@ img {
     color: #7a7a7a;
 }
 
+/* Lista de Pokémon en perfil (sin cajas) */
+.profile-pokemon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--spacing-xl);
+    margin-top: var(--spacing-lg);
+}
+.full-width-grid {
+    max-width: none;
+}
+
+.profile-pokemon-item {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+}
+
+.profile-pokemon-image {
+    background: #f5f9ff;
+    border-radius: 12px;
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+}
+
+.profile-pokemon-image img {
+    width: 100%;
+    max-height: 160px;
+    object-fit: contain;
+}
+
+.profile-pokemon-meta {
+    margin-top: var(--spacing-sm);
+}
+
+.profile-pokemon-id {
+    font-size: 0.85rem;
+    color: var(--color-gris-medio);
+    margin-bottom: 4px;
+}
+
+.profile-pokemon-name {
+    font-family: var(--font-encabezados);
+    font-size: 1.4rem;
+    color: var(--color-azul-poke);
+    margin-bottom: var(--spacing-sm);
+}
+
+.profile-pokemon-tags {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.tag.type { background: var(--color-rojo-poke); color: #fff; }
+.tag.qty { background: var(--color-dorado); color: var(--color-texto-principal); }
+.tag.price { background: var(--color-azul-poke); color: #fff; }
+
 .user-info {
     display: flex;
     align-items: center;
@@ -652,6 +720,7 @@ img {
     font-family: var(--font-encabezados);
     font-size: 2.8rem;
     text-align: center;
+    margin-top: var(--spacing-xl);
     margin-bottom: var(--spacing-xl);
     color: var(--color-rojo-poke);
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
@@ -1179,7 +1248,7 @@ img {
 
 .cart-item-image {
     width: 80px;
-    height: 80px;
+    height: 80px;    
     background: var(--color-dorado);
     border-radius: 10px;
     display: flex;
@@ -1246,31 +1315,64 @@ img {
     position: sticky;
     top: 100px;
     border: 3px solid var(--color-dorado);
-    background: white;
+    background:
+        /* Pokéball watermark pattern */
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><g opacity="0.06"><circle cx="30" cy="30" r="18" fill="%23ffffff" stroke="%233B5AA6" stroke-width="2"/><rect x="12" y="28" width="36" height="4" fill="%23FFCB05"/><circle cx="30" cy="30" r="6" fill="%23ffffff" stroke="%233B5AA6" stroke-width="2"/></g></svg>') repeat,
+        linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    background-size: 120px 120px, auto;
     border-radius: 20px;
-    box-shadow: var(--shadow-media);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
     padding: var(--spacing-xl);
+    margin-top: var(--spacing-lg); /* Alejar un poco el cuadro amarillo de los Pokémon */
+    overflow: hidden;
+}
+
+.cart-summary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background: var(--color-rojo-poke);
 }
 
 .summary-card h3 {
     color: var(--color-azul-poke);
     margin-bottom: var(--spacing-lg);
     text-align: center;
+    font-family: var(--font-encabezados);
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
 }
 
 .summary-line {
     display: flex;
     justify-content: space-between;
     margin-bottom: var(--spacing-md);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 1px solid var(--color-gris-medio);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: rgba(255,255,255,0.85);
+    border: 2px dashed var(--color-azul-poke);
+    border-radius: 10px;
 }
 
 .summary-line.total {
-    font-size: 1.3rem;
-    font-weight: bold;
-    border-bottom: 3px solid var(--color-rojo-poke);
+    font-size: 1.4rem;
+    font-weight: 800;
     color: var(--color-rojo-poke);
+    border: 2px solid var(--color-rojo-poke);
+    background: rgba(255, 203, 5, 0.12);
+}
+
+/* Mayor separación entre los botones de la tarjeta resumen del carrito */
+.cart-summary .btn-primary,
+.cart-summary .btn-secondary {
+    margin-right: var(--spacing-md);
+}
+
+.cart-summary .btn-primary:last-child,
+.cart-summary .btn-secondary:last-child {
+    margin-right: 0;
 }
 
 .discount {
@@ -1339,6 +1441,11 @@ img {
     color: var(--color-azul-poke);
     display: block;
     margin-bottom: var(--spacing-xs);
+}
+
+/* Separación extra antes del botón de enviar en Contacto */
+.contact-form .btn-primary {
+    margin-top: var(--spacing-lg);
 }
 
 .faq {

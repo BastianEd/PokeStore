@@ -1,7 +1,8 @@
-// app/routes/cart.tsx
 import type { Route } from "./+types/cart";
 import { useCart } from "~/services/cart-context";
 import { useNotification } from "~/services/notification-context";
+import { useAuth } from "~/services/auth-context";
+import { FiShoppingCart } from "react-icons/fi";
 
 export function meta({}: Route.MetaArgs) {
     return [{ title: "Carrito de Captura - Pokémon Trading Co." }];
@@ -10,6 +11,7 @@ export function meta({}: Route.MetaArgs) {
 export default function CartPage() {
     const { items, totalItems, totalPrice, removeFromCart, clearCart } = useCart();
     const { showNotification } = useNotification();
+    const { agregarCompras } = useAuth();
 
     if (totalItems === 0) {
         return (
@@ -38,7 +40,6 @@ export default function CartPage() {
 
                             <div className="cart-item-info">
                                 <h3>{item.nombre}</h3>
-                                {/* Se asume que item ahora tiene 'tipoPrincipal' */}
                                 <p>Tipo: {item.tipoPrincipal}</p> 
                                 <p>Cantidad: {item.quantity}</p>
                                 <p>Precio unidad: {new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(item.precio)}</p>
@@ -58,18 +59,28 @@ export default function CartPage() {
                 <div className="cart-summary">
                     <p>Total Pokémon en el Equipo: {totalItems}</p>
                     <p>Total a pagar: {new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(totalPrice)}</p>
-                    <div style={{ display: "flex", gap: "12px" }}>
+                    <div className="button-row">
                         <button className="btn-secondary" onClick={clearCart}>
                             Liberar Equipo
                         </button>
                         <button
                             className="btn-primary"
                             onClick={() => {
+                                agregarCompras(
+                                    items.map((i) => ({
+                                        pokedexId: i.pokedexId,
+                                        nombre: i.nombre,
+                                        imagen: i.imagen,
+                                        tipoPrincipal: i.tipoPrincipal,
+                                        quantity: i.quantity,
+                                        precio: i.precio,
+                                    }))
+                                );
                                 showNotification("¡Compra realizada! Tus Pokémon ya son tuyos.");
                                 clearCart();
                             }}
                         >
-                            Comprar
+                            <FiShoppingCart style={{ marginRight: 8 }} /> Comprar
                         </button>
                     </div>
                 </div>

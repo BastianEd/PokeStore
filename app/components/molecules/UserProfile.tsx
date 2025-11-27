@@ -1,4 +1,3 @@
-// app/components/organisms/UserProfile.tsx
 import { useEffect, useState } from "react";
 
 export type UsuarioTipo = "mayor" | "estudiante" | "regular";
@@ -21,7 +20,6 @@ function leerUsuarioActual(): UsuarioActual | null {
     }
 }
 
-// 👇 hook reutilizable
 export function useCurrentUser() {
     const [user, setUser] = useState<UsuarioActual | null>(null);
 

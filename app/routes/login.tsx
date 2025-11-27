@@ -1,4 +1,3 @@
-// app/routes/login.tsx
 import type { Route } from "./+types/login";
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";

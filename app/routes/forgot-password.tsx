@@ -1,4 +1,3 @@
-// app/routes/forgot-password.tsx
 import type { Route } from "./+types/forgot-password";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";

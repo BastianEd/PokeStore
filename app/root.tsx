@@ -247,7 +247,7 @@ function SearchSuggestions({ searchText, onClose }: { searchText: string; onClos
         <div className="search-suggestions" role="listbox">
             {results.map((p) => (
                 <a key={p.pokedexId} href={`/productos?q=${encodeURIComponent(p.nombre)}&exact=1#${p.pokedexId}`} className="suggestion-card" role="option" onClick={onClose}>
-                    <img src={p.imagen} alt={p.nombre} className="suggestion-image" />
+                    <img src={p.imagen} alt={p.nombre} className="suggestion-image img-no-white" />
                     <div className="suggestion-info">
                         <strong className="suggestion-name">{p.nombre}</strong>
                         <span className="suggestion-type">{p.tipoPrincipal}</span>

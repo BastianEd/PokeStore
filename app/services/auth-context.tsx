@@ -18,6 +18,14 @@ export interface Usuario {
     password: string;
     tipoUsuario: TipoUsuario;
     fechaNacimiento?: string; // yyyy-mm-dd (opcional para demos)
+    compras?: Array<{
+        pokedexId: number;
+        nombre: string;
+        imagen: string;
+        tipoPrincipal: string;
+        quantity: number;
+        precio: number;
+    }>;
 }
 
 interface AuthState {
@@ -34,6 +42,14 @@ interface AuthContextValue extends AuthState {
         password: string;
         fechaNacimiento?: string;
     }) => void;
+    agregarCompras: (items: Array<{
+        pokedexId: number;
+        nombre: string;
+        imagen: string;
+        tipoPrincipal: string;
+        quantity: number;
+        precio: number;
+    }>) => void;
 }
 
 const DEMO_USERS: Usuario[] = [];
@@ -129,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             password,
             tipoUsuario,
             fechaNacimiento,
+            compras: [],
         };
 
         setState((prev) => ({
@@ -139,6 +156,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Beneficios eliminados: ya no se calculan beneficios por tipo de usuario.
 
+    const agregarCompras: AuthContextValue["agregarCompras"] = (items) => {
+        setState((prev) => {
+            if (!prev.usuarioActual) return prev;
+            const actualizado = {
+                ...prev.usuarioActual,
+                compras: [...(prev.usuarioActual.compras ?? []), ...items],
+            };
+            return {
+                usuarios: prev.usuarios.map((u) =>
+                    u.id === actualizado.id ? actualizado : u,
+                ),
+                usuarioActual: actualizado,
+            };
+        });
+    };
+
     return (
         <AuthContext.Provider
             value={{
@@ -146,6 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 login,
                 logout,
                 register,
+                agregarCompras,
             }}
         >
             {children}
