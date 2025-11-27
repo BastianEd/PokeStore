@@ -1,5 +1,6 @@
 import type { Route } from "./+types/products";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router";
 // Importar la nueva data: POKEMONS, TIPOS, Pokemon
 import { POKEMONS, TIPOS, type Pokemon } from "~/data/products"; 
 import { ProductCard } from "~/components/molecules/ProductCard"; 
@@ -11,6 +12,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Productos() {
     const [search, setSearch] = useState("");
+    const location = useLocation();
     // Usar 'tipoSeleccionado' en lugar de 'categoriaSeleccionada'
     const [tipoSeleccionado, setTipoSeleccionado] = useState<string>("all");
     
@@ -37,16 +39,22 @@ export default function Productos() {
                     p.tipoPrincipal === tipoSeleccionado; // Filtrar por tipoPrincipal
 
                 const term = search.trim().toLowerCase();
-                const matchSearch =
-                    term === "" ||
-                    p.nombre.toLowerCase().includes(term) ||
-                    p.descripcion.toLowerCase().includes(term) ||
-                    p.tipoPrincipal.toLowerCase().includes(term); 
+                const exact = new URLSearchParams(location.search).get("exact") === "1";
+                const matchSearch = exact
+                    ? term === "" || p.nombre.toLowerCase() === term
+                    : term === "" || p.nombre.toLowerCase().includes(term);
 
                 return matchTipo && matchSearch;
             }),
-        [search, tipoSeleccionado],
+        [search, tipoSeleccionado, location.search],
     );
+
+    // Sincronizar el término de búsqueda desde el query param `q`
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const q = params.get("q") || "";
+        setSearch(q);
+    }, [location.search]);
 
     return (
         <section id="productos" className="section active">

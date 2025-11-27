@@ -15,7 +15,10 @@ import "./app.css";
 import { CartProvider } from "~/services/cart-context";
 import { AuthProvider, useAuth } from "~/services/auth-context";
 import { NotificationProvider } from "~/services/notification-context";
-import { useState } from "react"; 
+import { useMemo, useState } from "react"; 
+import { useNavigate, useLocation } from "react-router";
+import { FaSearch } from "react-icons/fa";
+import { POKEMONS, type Pokemon } from "~/data/products";
 
 export const links: Route.LinksFunction = () => [
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -38,6 +41,10 @@ function Shell({ children }: { children: React.ReactNode }) {
     const { usuarioActual, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+        const [searchText, setSearchText] = useState("");
+        const [showSuggestions, setShowSuggestions] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const handleToggleMenu = () => {
         setIsMenuOpen(prev => !prev);
@@ -88,11 +95,29 @@ function Shell({ children }: { children: React.ReactNode }) {
 
                         {/* 2. SECCIÓN CENTRAL: BARRA DE BÚSQUEDA */}
                         <div className="product-controls">
+                        <span className="search-icon" aria-hidden="true"><FaSearch /></span>
+
                             <input
                                 type="text"
                                 className="product-search"
                                 placeholder="Buscar Charizard, Pokeballs, Guías..."
+                                arialabel="Buscar"
+                                value={searchText}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setSearchText(val);
+                                        setShowSuggestions(val.trim().length > 0);
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Escape") {
+                                        setShowSuggestions(false);
+                                    }
+                                }}
                             />
+
+                                {showSuggestions && (
+                                    <SearchSuggestions searchText={searchText} onClose={() => setShowSuggestions(false)} />
+                                )}
                         </div>
 
 
@@ -205,4 +230,30 @@ export default function App() {
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     return null; 
+}
+
+function SearchSuggestions({ searchText, onClose }: { searchText: string; onClose: () => void }) {
+    const term = searchText.trim().toLowerCase();
+    const results = useMemo(() => {
+        if (!term) return [] as Pokemon[];
+        return POKEMONS.filter(p =>
+            p.nombre.toLowerCase().includes(term)
+        ).slice(0, 6);
+    }, [term]);
+
+    if (results.length === 0) return null;
+
+    return (
+        <div className="search-suggestions" role="listbox">
+            {results.map((p) => (
+                <a key={p.pokedexId} href={`/productos?q=${encodeURIComponent(p.nombre)}&exact=1#${p.pokedexId}`} className="suggestion-card" role="option" onClick={onClose}>
+                    <img src={p.imagen} alt={p.nombre} className="suggestion-image" />
+                    <div className="suggestion-info">
+                        <strong className="suggestion-name">{p.nombre}</strong>
+                        <span className="suggestion-type">{p.tipoPrincipal}</span>
+                    </div>
+                </a>
+            ))}
+        </div>
+    );
 }
