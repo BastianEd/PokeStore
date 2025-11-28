@@ -1,24 +1,46 @@
 import type { Route } from "./+types/products";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router";
-// Importar la nueva data: POKEMONS, TIPOS, Pokemon
-import { POKEMONS, TIPOS, type Pokemon } from "~/data/products"; 
-import { ProductCard } from "~/components/molecules/ProductCard"; 
+// Ya no importamos POKEMONS estático, solo los tipos
+import { TIPOS, type Pokemon } from "~/data/products";
+import { ProductCard } from "~/components/molecules/ProductCard";
 import { ProductModal } from "~/components/organisms/ProductModal";
+import { ProductService } from "~/services/product.service"; // Importamos el servicio
 
 export function meta({}: Route.MetaArgs) {
     return [{ title: "Pokédex de Venta - Pokémon Trading Co." }];
 }
 
 export default function Productos() {
+    const [products, setProducts] = useState<Pokemon[]>([]); // Estado para los productos
+    const [loading, setLoading] = useState(true); // Estado de carga
+    const [error, setError] = useState<string | null>(null);
+
     const [search, setSearch] = useState("");
     const location = useLocation();
-    // Usar 'tipoSeleccionado' en lugar de 'categoriaSeleccionada'
     const [tipoSeleccionado, setTipoSeleccionado] = useState<string>("all");
-    
+
     // Estado para el modal
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
+
+    // EFECTO: Cargar productos desde el Backend al montar el componente
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                const data = await ProductService.getAll();
+                setProducts(data);
+            } catch (err) {
+                console.error("Error cargando productos:", err);
+                setError("No se pudieron cargar los Pokémon. Verifica que el servidor esté corriendo.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, []);
 
     const handleViewPokemon = (pokemon: Pokemon) => {
         setSelectedPokemon(pokemon);
@@ -30,37 +52,60 @@ export default function Productos() {
         setSelectedPokemon(null);
     };
 
-    // Lógica de filtrado actualizada
-    const pokemonsFiltrados = useMemo(
-        () =>
-            POKEMONS.filter((p) => {
-                const matchTipo =
-                    tipoSeleccionado === "all" ||
-                    p.tipoPrincipal === tipoSeleccionado; // Filtrar por tipoPrincipal
+    // Lógica de filtrado (ahora usa el estado 'products' en vez de la constante POKEMONS)
+    const pokemonsFiltrados = useMemo(() => {
+        return products.filter((p) => {
+            // 1. Normalización (limpieza) de datos para comparar
+            // Convertimos todo a minúsculas para evitar errores de "Fuego" vs "fuego"
+            const tipoPokemon = p.tipoPrincipal?.toLowerCase().trim() || "";
+            const tipoFiltro = tipoSeleccionado.toLowerCase().trim();
+            const terminoBusqueda = search.trim().toLowerCase();
 
-                const term = search.trim().toLowerCase();
-                const exact = new URLSearchParams(location.search).get("exact") === "1";
-                const matchSearch = exact
-                    ? term === "" || p.nombre.toLowerCase() === term
-                    : term === "" || p.nombre.toLowerCase().includes(term);
+            // 2. Lógica de coincidencia de TIPO
+            const matchTipo =
+                tipoSeleccionado === "all" ||
+                tipoPokemon === tipoFiltro;
 
-                return matchTipo && matchSearch;
-            }),
-        [search, tipoSeleccionado, location.search],
-    );
+            // 3. Lógica de coincidencia de BÚSQUEDA (Nombre o ID)
+            const isExact = new URLSearchParams(location.search).get("exact") === "1";
 
-    // Sincronizar el término de búsqueda desde el query param `q`
+            // Permitimos buscar por nombre O por ID (pokedexId)
+            const matchSearch = isExact
+                ? terminoBusqueda === "" || p.nombre.toLowerCase() === terminoBusqueda
+                : terminoBusqueda === "" ||
+                p.nombre.toLowerCase().includes(terminoBusqueda) ||
+                p.pokedexId.toString().includes(terminoBusqueda);
+
+            return matchTipo && matchSearch;
+        });
+    }, [search, tipoSeleccionado, location.search, products]);
+
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const q = params.get("q") || "";
         setSearch(q);
     }, [location.search]);
 
+    if (loading) {
+        return (
+            <div className="container" style={{ padding: "4rem", textAlign: "center" }}>
+                <p>Cargando Pokédex desde el servidor...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="container" style={{ padding: "4rem", textAlign: "center", color: "red" }}>
+                <p>{error}</p>
+            </div>
+        );
+    }
+
     return (
         <section id="productos" className="section active">
             <div className="container">
                 <h2 className="section-title">Pokédex</h2>
-
 
                 <div className="filters">
                     <button
@@ -69,7 +114,8 @@ export default function Productos() {
                     >
                         Todos
                     </button>
-                    {TIPOS.map((tipo) => ( // Mapear por TIPOS
+                    {/* Nota: Idealmente los TIPOS también deberían venir del backend */}
+                    {TIPOS.map((tipo) => (
                         <button
                             key={tipo}
                             className={"filter-btn" + (tipoSeleccionado === tipo ? " active" : "")}
@@ -82,24 +128,24 @@ export default function Productos() {
 
                 <div className="products-grid">
                     {pokemonsFiltrados.map((pokemon) => (
-                        <ProductCard 
-                            key={pokemon.pokedexId} 
-                            pokemon={pokemon} // Pasar prop renombrada
-                            onView={handleViewPokemon} // Pasar handler renombrado
+                        <ProductCard
+                            key={pokemon.pokedexId}
+                            pokemon={pokemon}
+                            onView={handleViewPokemon}
                         />
                     ))}
                     {pokemonsFiltrados.length === 0 && (
                         <p className="empty-message">
-                            No hay Pokémon disponibles que coincidan con tu búsqueda. ¡Intenta con otro filtro! 😔
+                            No hay Pokémon disponibles que coincidan con tu búsqueda.
                         </p>
                     )}
                 </div>
             </div>
 
-            <ProductModal 
-                isOpen={modalOpen} 
-                onClose={handleCloseModal} 
-                pokemon={selectedPokemon} // Pasar prop renombrada
+            <ProductModal
+                isOpen={modalOpen}
+                onClose={handleCloseModal}
+                pokemon={selectedPokemon}
             />
         </section>
     );

@@ -1,49 +1,6 @@
-// app/components/molecules/AuthForm.tsx
-import {
-    useEffect,
-    useState,
-    type FormEvent,
-} from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
-
-type UsuarioTipo = "regular";
-
-type Usuario = {
-    email: string;
-    password: string;
-    tipo: UsuarioTipo;
-};
-
-const STORAGE_KEY = "usuarios_pokestore";
-const CURRENT_KEY = "usuario_actual_pokestore";
-
-const DEMO_USERS: Usuario[] = [];
-
-// --- helpers de localStorage ---
-
-function leerUsuarios(): Usuario[] {
-    if (typeof window === "undefined") return [];
-
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-        // sin seeding: comenzamos vacíos
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-        return [];
-    }
-
-    try {
-        const guardados = JSON.parse(raw) as Usuario[];
-        return Array.isArray(guardados) ? guardados : [];
-    } catch {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-        return [];
-    }
-}
-
-function guardarUsuarios(usuarios: Usuario[]) {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(usuarios));
-}
+import { useAuth } from "~/services/auth-context";
 
 interface AuthFormProps {
     mode: "login" | "register";
@@ -51,94 +8,59 @@ interface AuthFormProps {
 
 export function AuthForm({ mode }: AuthFormProps) {
     const navigate = useNavigate();
+    const { login, register } = useAuth(); // <--- Accedemos a las funciones reales
     const isLogin = mode === "login";
 
+    const [nombre, setNombre] = useState(""); // Nuevo campo para registro
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [tipo, setTipo] = useState<UsuarioTipo>("regular");
 
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
-    // Asegura que existan los usuarios demo
-    useEffect(() => {
-        leerUsuarios();
-    }, []);
-
-    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
-        setSuccess(null);
+        setLoading(true);
 
-        if (typeof window === "undefined") return;
-
-        if (isLogin) {
-            // ---- LOGIN ----
-            const usuarios = leerUsuarios();
-            const usuario = usuarios.find(
-                (u) => u.email === email && u.password === password,
-            );
-
-            if (!usuario) {
-                setError("Correo o contraseña incorrectos");
-                return;
+        try {
+            if (isLogin) {
+                await login(email, password);
+                navigate("/"); // Redirigir al home
+            } else {
+                await register(nombre, email, password);
+                navigate("/");
             }
-
-            window.localStorage.setItem(
-                CURRENT_KEY,
-                JSON.stringify({ email: usuario.email, tipo: usuario.tipo }),
-            );
-            // avisar al header que cambió el usuario
-            window.dispatchEvent(new Event("usuario_actual_pokestore_changed"));
-
-            setSuccess("Inicio de sesión exitoso 😎");
-
-            navigate("/");
-        } else {
-            // ---- REGISTRO ----
-            if (!email || !password) {
-                setError("Completa todos los campos");
-                return;
-            }
-
-            let usuarios = leerUsuarios();
-
-            if (usuarios.some((u) => u.email === email)) {
-                setError("Ya existe un usuario con ese correo");
-                return;
-            }
-
-            const nuevo: Usuario = { email, password, tipo };
-            usuarios = [...usuarios, nuevo];
-            guardarUsuarios(usuarios);
-
-            // lo dejamos logeado inmediatamente
-            window.localStorage.setItem(
-                CURRENT_KEY,
-                JSON.stringify({ email: nuevo.email, tipo: nuevo.tipo }),
-            );
-            window.dispatchEvent(new Event("usuario_actual_pokestore_changed"));
-
-            setSuccess("Registro exitoso. Te hemos iniciado sesión automáticamente 🎉");
-            navigate("/");
+        } catch (err: any) {
+            // Mostramos el mensaje que viene del servicio/backend
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <section className="section active auth-section">
             <div className="container auth-layout">
-                {/* Panel principal */}
                 <div className="auth-card">
                     <h2 className="section-title">
-                        {isLogin ? "Iniciar Sesión - PokeStore" : "Registro - PokeStore"}
+                        {isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
                     </h2>
-                    <p className="auth-subtitle">
-                        {isLogin
-                            ? "Ingresa con tu correo y contraseña para acceder a tu cuenta."
-                            : "Crea tu cuenta para comenzar a comprar en PokeStore."}
-                    </p>
 
                     <form className="auth-form" onSubmit={handleSubmit}>
+                        {!isLogin && (
+                            <label className="form-field">
+                                <span>Nombre</span>
+                                <input
+                                    type="text"
+                                    value={nombre}
+                                    onChange={(e) => setNombre(e.target.value)}
+                                    required
+                                    placeholder="Tu nombre"
+                                />
+                            </label>
+                        )}
+
                         <label className="form-field">
                             <span>Correo electrónico</span>
                             <input
@@ -146,7 +68,6 @@ export function AuthForm({ mode }: AuthFormProps) {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                placeholder="ej: usuario@gmail.com"
                             />
                         </label>
 
@@ -157,38 +78,34 @@ export function AuthForm({ mode }: AuthFormProps) {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                placeholder="••••••••"
                             />
                         </label>
 
+                        {error && <p className="form-error" style={{color: 'red'}}>{error}</p>}
 
-                        {error && <p className="form-error">{error}</p>}
-                        {success && <p className="form-success">{success}</p>}
-
-                        <button type="submit" className="btn-primary auth-submit-btn">
-                            {isLogin ? "Entrar" : "Registrarme"}
+                        <button type="submit" className="btn-primary auth-submit-btn" disabled={loading}>
+                            {loading ? "Cargando..." : (isLogin ? "Entrar" : "Registrarme")}
                         </button>
-
                         <div className="auth-switch">
                             {isLogin ? (
-                                <span>
-                  ¿No tienes cuenta?{" "}
-                                    <Link to="/registro" className="auth-link">
-                    Crear una cuenta
-                  </Link>
-                </span>
-                            ) : (
-                                <span>
-                  ¿Ya tienes cuenta?{" "}
-                                    <Link to="/login" className="auth-link">
-                    Inicia sesión
-                  </Link>
-                </span>
-                            )}
+                                    <span>
+                                      ¿No tienes cuenta?{" "}
+                                                        <Link to="/registro" className="auth-link">
+                                        Crear una cuenta
+                                      </Link>
+                                    </span>
+                                ) : (
+                                    <span>
+                                      ¿Ya tienes cuenta?{" "}
+                                                        <Link to="/login" className="auth-link">
+                                        Inicia sesión
+                                      </Link>
+                                    </span>
+                                )
+                            }
                         </div>
                     </form>
                 </div>
-
             </div>
         </section>
     );

@@ -70,8 +70,23 @@ export const POKE_TRADING_CO = {
     vision: "Convertirnos en el mercado Pokémon online líder en la región de Kanto y más allá, siendo el punto de encuentro de entrenadores y coleccionistas.",
 };
 
-export const TIPOS: string[] = Array.from(
-    new Set(POKEMONS.map((p) => p.tipoPrincipal)),
-);
+export const TIPOS = [
+    "Fuego",
+    "Agua",
+    "Planta",
+    "Eléctrico",
+    "Veneno",
+    "Normal",
+    "Volador",
+    "Hada",
+    "Lucha",
+    "Psíquico",
+    "Tierra",
+    "Roca",
+    "Hielo",
+    "Fantasma",
+    "Dragón",
+    "Acero"
+];
 
 export const CATEGORIAS: string[] = TIPOS;

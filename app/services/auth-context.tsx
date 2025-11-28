@@ -1,4 +1,3 @@
-// app/services/auth-context.tsx
 import {
     createContext,
     useContext,
@@ -6,191 +5,115 @@ import {
     useState,
     type ReactNode,
 } from "react";
+import api from "../services/api"; // Importamos nuestra instancia de Axios
+import { jwtDecode } from "jwt-decode";
 
-const STORAGE_KEY = "mil-sabores-auth";
-
-export type TipoUsuario = "mayor" | "estudiante_duoc" | "regular";
+const TOKEN_KEY = "jwt_token";
 
 export interface Usuario {
-    id: string;
-    nombre: string;
+    id: number; // Tu backend usa number para ID
     email: string;
-    password: string;
-    tipoUsuario: TipoUsuario;
-    fechaNacimiento?: string; // yyyy-mm-dd (opcional para demos)
-    compras?: Array<{
-        pokedexId: number;
-        nombre: string;
-        imagen: string;
-        tipoPrincipal: string;
-        quantity: number;
-        precio: number;
-    }>;
+    roles: string[]; // Tu backend maneja roles
+    // Agrega más campos si el payload del token los trae
 }
 
 interface AuthState {
-    usuarios: Usuario[];
     usuarioActual: Usuario | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
 }
 
 interface AuthContextValue extends AuthState {
-    login: (email: string, password: string) => void;
+    login: (email: string, password: string) => Promise<void>;
+    register: (nombre: string, email: string, password: string) => Promise<void>;
     logout: () => void;
-    register: (data: {
-        nombre: string;
-        email: string;
-        password: string;
-        fechaNacimiento?: string;
-    }) => void;
-    agregarCompras: (items: Array<{
-        pokedexId: number;
-        nombre: string;
-        imagen: string;
-        tipoPrincipal: string;
-        quantity: number;
-        precio: number;
-    }>) => void;
-}
-
-const DEMO_USERS: Usuario[] = [];
-
-function cargarEstadoInicial(): AuthState {
-    if (typeof window === "undefined") {
-        return { usuarios: [], usuarioActual: null };
-    }
-
-    try {
-        const raw = window.localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-            return { usuarios: [], usuarioActual: null };
-        }
-        const parsed = JSON.parse(raw) as AuthState;
-
-        return {
-            usuarios: parsed.usuarios ?? [],
-            usuarioActual: parsed.usuarioActual ?? null,
-        };
-    } catch {
-        return { usuarios: [], usuarioActual: null };
-    }
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [state, setState] = useState<AuthState>(cargarEstadoInicial);
+    const [state, setState] = useState<AuthState>({
+        usuarioActual: null,
+        isAuthenticated: false,
+        isLoading: true,
+    });
+
+    // Función auxiliar para decodificar el token y setear el usuario
+    const cargarUsuarioDesdeToken = (token: string) => {
+        try {
+            const decoded: any = jwtDecode(token);
+            // Ajusta estos campos según lo que tu Backend guarde en el JWT payload
+            const usuario: Usuario = {
+                id: decoded.sub, // 'sub' suele ser el ID en JWT estándar
+                email: decoded.email || "", // Asegúrate que tu backend incluya el email en el payload
+                roles: decoded.roles || [],
+            };
+
+            setState({
+                usuarioActual: usuario,
+                isAuthenticated: true,
+                isLoading: false,
+            });
+        } catch (error) {
+            logout();
+        }
+    };
 
     useEffect(() => {
-        if (typeof window === "undefined") return;
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }, [state]);
-
-    const login: AuthContextValue["login"] = (email, password) => {
-        const usuario = state.usuarios.find(
-            (u) =>
-                u.email.toLowerCase() === email.toLowerCase().trim() &&
-                u.password === password,
-        );
-
-        if (!usuario) {
-            throw new Error("Correo o contraseña incorrectos.");
+        const token = localStorage.getItem(TOKEN_KEY);
+        if (token) {
+            cargarUsuarioDesdeToken(token);
+        } else {
+            setState((prev) => ({ ...prev, isLoading: false }));
         }
+    }, []);
 
-        setState((prev) => ({ ...prev, usuarioActual: usuario }));
-    };
+    const login = async (email: string, password: string) => {
+        try {
+            // Tu AuthController no tiene versión, así que es /auth/login
+            const { data } = await api.post("/auth/login", { email, password });
 
-    const logout: AuthContextValue["logout"] = () => {
-        setState((prev) => ({ ...prev, usuarioActual: null }));
-    };
-
-    const inferirTipoUsuario = (
-        email: string,
-        fechaNacimiento?: string,
-    ): TipoUsuario => {
-        if (email.toLowerCase().endsWith("@duoc.cl")) return "estudiante_duoc";
-
-        if (fechaNacimiento) {
-            const cumple = new Date(fechaNacimiento);
-            const hoy = new Date();
-            let edad = hoy.getFullYear() - cumple.getFullYear();
-            const m = hoy.getMonth() - cumple.getMonth();
-            if (m < 0 || (m === 0 && hoy.getDate() < cumple.getDate())) {
-                edad--;
-            }
-            if (edad >= 60) return "mayor";
+            // Asumiendo que el backend devuelve { access_token: "..." }
+            const token = data.access_token;
+            localStorage.setItem(TOKEN_KEY, token);
+            cargarUsuarioDesdeToken(token);
+        } catch (error: any) {
+            console.error("Error Login:", error);
+            throw new Error(error.response?.data?.message || "Error al iniciar sesión");
         }
-
-        return "regular";
     };
 
-    const register: AuthContextValue["register"] = ({
-                                                        nombre,
-                                                        email,
-                                                        password,
-                                                        fechaNacimiento,
-                                                    }) => {
-        const yaExiste = state.usuarios.some(
-            (u) => u.email.toLowerCase() === email.toLowerCase().trim(),
-        );
-        if (yaExiste) {
-            throw new Error("Ya existe un usuario registrado con este correo.");
+    const register = async (nombre: string, email: string, password: string) => {
+        try {
+            // Tu AuthController: /auth/register
+            await api.post("/auth/register", { name: nombre, email, password });
+            // Después del registro, podrías hacer login automático o pedir que inicie sesión
+            await login(email, password);
+        } catch (error: any) {
+            console.error("Error Registro:", error);
+            throw new Error(error.response?.data?.message || "Error al registrarse");
         }
-
-        const tipoUsuario = inferirTipoUsuario(email, fechaNacimiento);
-
-        const nuevo: Usuario = {
-            id: `user-${Date.now()}`,
-            nombre: nombre.trim(),
-            email: email.trim(),
-            password,
-            tipoUsuario,
-            fechaNacimiento,
-            compras: [],
-        };
-
-        setState((prev) => ({
-            usuarios: [...prev.usuarios, nuevo],
-            usuarioActual: nuevo,
-        }));
     };
 
-    // Beneficios eliminados: ya no se calculan beneficios por tipo de usuario.
-
-    const agregarCompras: AuthContextValue["agregarCompras"] = (items) => {
-        setState((prev) => {
-            if (!prev.usuarioActual) return prev;
-            const actualizado = {
-                ...prev.usuarioActual,
-                compras: [...(prev.usuarioActual.compras ?? []), ...items],
-            };
-            return {
-                usuarios: prev.usuarios.map((u) =>
-                    u.id === actualizado.id ? actualizado : u,
-                ),
-                usuarioActual: actualizado,
-            };
+    const logout = () => {
+        localStorage.removeItem(TOKEN_KEY);
+        setState({
+            usuarioActual: null,
+            isAuthenticated: false,
+            isLoading: false,
         });
+        window.location.reload() //Recargamos para limpiar estados de memoria
     };
 
     return (
-        <AuthContext.Provider
-            value={{
-                ...state,
-                login,
-                logout,
-                register,
-                agregarCompras,
-            }}
-        >
+        <AuthContext.Provider value={{ ...state, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     );
 }
 
-export function useAuth(): AuthContextValue {
+export function useAuth() {
     const ctx = useContext(AuthContext);
-    if (!ctx) {
-        throw new Error("useAuth debe usarse dentro de un AuthProvider");
-    }
+    if (!ctx) throw new Error("useAuth debe usarse dentro de AuthProvider");
     return ctx;
 }
