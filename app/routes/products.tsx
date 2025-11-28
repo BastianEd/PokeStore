@@ -55,30 +55,33 @@ export default function Productos() {
     // Lógica de filtrado (ahora usa el estado 'products' en vez de la constante POKEMONS)
     const pokemonsFiltrados = useMemo(() => {
         return products.filter((p) => {
-            // 1. Normalización (limpieza) de datos para comparar
-            // Convertimos todo a minúsculas para evitar errores de "Fuego" vs "fuego"
-            const tipoPokemon = p.tipoPrincipal?.toLowerCase().trim() || "";
-            const tipoFiltro = tipoSeleccionado.toLowerCase().trim();
-            const terminoBusqueda = search.trim().toLowerCase();
+            // 1. Manejo de Tipos (Soporte para múltiples tipos como "Fuego, Volador")
+            // Convertimos la string de la BD en un array: "Fuego, Volador" -> ["fuego", "volador"]
+            const tiposDelPokemon = (p.tipoPrincipal || "")
+                .toLowerCase()
+                .split(",")
+                .map((t) => t.trim());
 
-            // 2. Lógica de coincidencia de TIPO
+            const filtroSeleccionado = tipoSeleccionado.toLowerCase().trim();
+
+            // Verificamos si la lista de tipos del pokemon INCLUYE la categoría seleccionada
             const matchTipo =
                 tipoSeleccionado === "all" ||
-                tipoPokemon === tipoFiltro;
+                tiposDelPokemon.includes(filtroSeleccionado);
 
-            // 3. Lógica de coincidencia de BÚSQUEDA (Nombre o ID)
+            // 2. Búsqueda por Texto (Nombre o ID)
+            const term = search.trim().toLowerCase();
             const isExact = new URLSearchParams(location.search).get("exact") === "1";
 
-            // Permitimos buscar por nombre O por ID (pokedexId)
             const matchSearch = isExact
-                ? terminoBusqueda === "" || p.nombre.toLowerCase() === terminoBusqueda
-                : terminoBusqueda === "" ||
-                p.nombre.toLowerCase().includes(terminoBusqueda) ||
-                p.pokedexId.toString().includes(terminoBusqueda);
+                ? term === "" || p.nombre.toLowerCase() === term
+                : term === "" ||
+                p.nombre.toLowerCase().includes(term) ||
+                p.pokedexId.toString().includes(term);
 
             return matchTipo && matchSearch;
         });
-    }, [search, tipoSeleccionado, location.search, products]);
+    }, [products, search, tipoSeleccionado, location.search]);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
