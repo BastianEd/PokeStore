@@ -24,7 +24,7 @@ export const ProductService = {
                 nombre: item.nombre,
                 tipoPrincipal: item.tipo,
                 precio: item.precio,
-                imagen: item.imagenUrl || "app/assets/img/pokeball.png",
+                imagen: item.imagenUrl || "app/assets/img/pokeball.webp",
                 // 👇 Usamos la descripción real. Si viene vacía, fallback.
                 descripcion: item.descripcion || "Descripción no disponible.",
                 destacado: false

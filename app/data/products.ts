@@ -15,7 +15,7 @@ export const POKEMONS: Pokemon[] = [
         tipoPrincipal: "Fuego",
         precio: 50000,
         descripcion: "Un Pokémon tipo Fuego, ideal para entrenadores principiantes. Su llama en la cola indica su salud.",
-        imagen: "app/assets/img/Charmander.png",
+        imagen: "app/assets/img/Charmander.webp",
         destacado: true
     },
     {
@@ -24,7 +24,7 @@ export const POKEMONS: Pokemon[] = [
         tipoPrincipal: "Agua",
         precio: 52000,
         descripcion: "Un pequeño Pokémon tortuga tipo Agua. Lanza chorros de agua con gran precisión.",
-        imagen: "app/assets/img/Squirtle.png",
+        imagen: "app/assets/img/Squirtle.webp",
     },
     {
         pokedexId: 25,
@@ -32,7 +32,7 @@ export const POKEMONS: Pokemon[] = [
         tipoPrincipal: "Eléctrico",
         precio: 75000,
         descripcion: "La mascota de la franquicia. Un pequeño roedor eléctrico, capaz de generar fuertes descargas.",
-        imagen: "app/assets/img/Pikachu.png",
+        imagen: "app/assets/img/Pikachu.webp",
         destacado: true
     },
     {
@@ -41,7 +41,7 @@ export const POKEMONS: Pokemon[] = [
         tipoPrincipal: "Planta",
         precio: 48000,
         descripcion: "Pokémon tipo Planta/Veneno. Lleva una semilla en su espalda que crece con él.",
-        imagen: "app/assets/img/Bulbasaur.png",
+        imagen: "app/assets/img/Bulbasaur.webp",
     },
     {
         pokedexId: 143,
@@ -49,7 +49,7 @@ export const POKEMONS: Pokemon[] = [
         tipoPrincipal: "Normal",
         precio: 60000,
         descripcion: "Un Pokémon muy grande que es más feliz cuando duerme. Su despertar requiere una Pokeflauta.",
-        imagen: "app/assets/img/Snorlax.png",
+        imagen: "app/assets/img/Snorlax.webp",
     },
     {
         pokedexId: 6,
@@ -57,7 +57,7 @@ export const POKEMONS: Pokemon[] = [
         tipoPrincipal: "Fuego",
         precio: 95000,
         descripcion: "Forma final de Charmander. Un dragón que escupe fuego con gran poder destructivo. Solo para entrenadores avanzados.",
-        imagen: "app/assets/img/Charizard.png",
+        imagen: "app/assets/img/Charizard.webp",
         destacado: true
     },
 ];

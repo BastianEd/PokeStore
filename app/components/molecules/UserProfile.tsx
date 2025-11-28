@@ -1,76 +1,68 @@
-import { useEffect, useState } from "react";
-
-export type UsuarioTipo = "mayor" | "estudiante" | "regular";
-
-export type UsuarioActual = {
-    email: string;
-    tipo: UsuarioTipo;
-};
-
-const CURRENT_USER_KEY = "usuario_actual_mil_sabores";
-
-function leerUsuarioActual(): UsuarioActual | null {
-    if (typeof window === "undefined") return null;
-    try {
-        const raw = window.localStorage.getItem(CURRENT_USER_KEY);
-        if (!raw) return null;
-        return JSON.parse(raw) as UsuarioActual;
-    } catch {
-        return null;
-    }
-}
-
-export function useCurrentUser() {
-    const [user, setUser] = useState<UsuarioActual | null>(null);
-
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-
-        const sync = () => {
-            setUser(leerUsuarioActual());
-        };
-
-        sync();
-
-        const handler = () => sync();
-        window.addEventListener("storage", handler);
-        window.addEventListener("usuario_actual_pokestore_changed", handler);
-
-        return () => {
-            window.removeEventListener("storage", handler);
-            window.removeEventListener("usuario_actual_pokestore_changed", handler);
-        };
-    }, []);
-
-    return user;
-}
+import { useAuth } from "~/services/auth-context";
+import { useNavigate } from "react-router";
 
 export function UserProfile() {
-    const currentUser = useCurrentUser();
+    const { usuarioActual, logout } = useAuth();
+    const navigate = useNavigate();
 
-    if (!currentUser) return null;
+    // Si no hay usuario cargado, no mostramos el componente
+    if (!usuarioActual) return null;
 
     const handleLogout = () => {
-        if (typeof window === "undefined") return;
-        window.localStorage.removeItem(CURRENT_USER_KEY);
-        window.dispatchEvent(new Event("usuario_actual_pokestore_changed"));
-        window.location.href = "/login";
+        logout();
+        navigate("/login");
     };
 
-    const labelPorTipo: Record<UsuarioTipo, string> = {
-        mayor: "Usuario Mayor - 50% descuento",
-        estudiante: "Estudiante Duoc - Torta de cumpleaños",
-        regular: "Usuario Regular",
-    };
+    // Transformamos los roles técnicos a texto amigable
+    const rolLegible = usuarioActual.roles?.includes('admin')
+        ? 'Profesor Pokémon'
+        : 'Entrenador';
 
     return (
         <div className="user-info">
             <div className="user-summary">
-                <span className="user-email">{currentUser.email}</span>
-                <span className="user-type">{labelPorTipo[currentUser.tipo]}</span>
+                {/* AQUI ESTÁ LA CLAVE: Usamos .nombre */}
+                <span className="user-name" style={{
+                    fontWeight: "800",
+                    color: "#3B5AA6", // Azul PokeStore
+                    fontSize: "1rem",
+                    display: "block",
+                    fontFamily: "'Lato', sans-serif"
+                }}>
+                    {/* Si por error el nombre viene vacío, mostramos "Entrenador" */}
+                    {usuarioActual.nombre || "Entrenador"}
+                </span>
+
+                <span className="user-email" style={{ fontSize: "0.8rem", color: "#666" }}>
+                    {usuarioActual.email}
+                </span>
+
+                <span className="user-role" style={{
+                    fontSize: "0.75rem",
+                    color: "#e67e22",
+                    fontWeight: "bold",
+                    textTransform: "uppercase"
+                }}>
+                    {rolLegible}
+                </span>
             </div>
-            <button type="button" className="btn-link" onClick={handleLogout}>
-                Cerrar sesión
+
+            <button
+                type="button"
+                className="btn-link"
+                onClick={handleLogout}
+                style={{
+                    marginLeft: "15px",
+                    color: "#e74c3c",
+                    fontSize: "0.9rem",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    background: "none",
+                    border: "none",
+                    padding: 0
+                }}
+            >
+                Salir
             </button>
         </div>
     );

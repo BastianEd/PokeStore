@@ -1,4 +1,3 @@
-// app/routes/register.tsx
 import type { Route } from "./+types/register";
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
@@ -20,7 +19,7 @@ export default function RegisterPage() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
 
@@ -28,7 +27,7 @@ export default function RegisterPage() {
         const email = String(formData.get("email") ?? "").trim();
         const password = String(formData.get("password") ?? "");
         const confirm = String(formData.get("confirm") ?? "");
-        const fechaNacimiento = String(formData.get("fechaNacimiento") ?? "") || undefined;
+        // El backend no soporta fecha de nacimiento aún, lo omitimos del envío
 
         setError(null);
 
@@ -49,7 +48,8 @@ export default function RegisterPage() {
 
         try {
             setLoading(true);
-            register({ nombre, email, password, fechaNacimiento });
+            // CORRECCIÓN: Pasamos argumentos separados (nombre, email, password)
+            await register(nombre, email, password);
             navigate("/", { replace: true });
         } catch (err: any) {
             setError(err?.message ?? "No se pudo registrar el usuario.");
@@ -92,6 +92,7 @@ export default function RegisterPage() {
                             />
                         </div>
 
+                        {/* Campo visual solamente (no se envía al backend por ahora) */}
                         <div className="form-group">
                             <label htmlFor="reg-fecha-nacimiento">
                                 Fecha de nacimiento (opcional)

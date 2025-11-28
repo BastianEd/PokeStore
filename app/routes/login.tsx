@@ -19,7 +19,7 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const email = String(formData.get("email") ?? "").trim();
@@ -34,9 +34,10 @@ export default function LoginPage() {
 
         try {
             setLoading(true);
-            login(email, password);
+            await login(email, password);
             navigate("/", { replace: true });
         } catch (err: any) {
+            // Mostramos el mensaje de error que viene del auth-context/API
             setError(err?.message ?? "Correo o contraseña incorrectos.");
         } finally {
             setLoading(false);

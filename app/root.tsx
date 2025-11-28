@@ -15,7 +15,7 @@ import "./app.css";
 import { CartProvider } from "~/services/cart-context";
 import { AuthProvider, useAuth } from "~/services/auth-context";
 import { NotificationProvider } from "~/services/notification-context";
-import { useMemo, useState } from "react"; 
+import { useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { FaSearch } from "react-icons/fa";
 import { POKEMONS, type Pokemon } from "~/data/products";
@@ -38,18 +38,19 @@ export const links: Route.LinksFunction = () => [
 ];
 
 function Shell({ children }: { children: React.ReactNode }) {
-    const { usuarioActual, logout } = useAuth();
+    // 1. AÑADIDO: Extraemos isAdmin del contexto
+    const { usuarioActual, logout, isAdmin } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-        const [searchText, setSearchText] = useState("");
-        const [showSuggestions, setShowSuggestions] = useState(false);
+    const [searchText, setSearchText] = useState("");
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
     const handleToggleMenu = () => {
         setIsMenuOpen(prev => !prev);
     };
-    
+
     const handleNavLinkClick = () => {
         setIsMenuOpen(false);
         setIsProfileMenuOpen(false);
@@ -66,27 +67,27 @@ function Shell({ children }: { children: React.ReactNode }) {
             if (e.target === e.currentTarget && isMenuOpen) {
                 handleOverlayClick();
             }
-        }}> 
+        }}>
             <header className="header">
                 <nav className="navbar">
                     <div className="container">
                         {/* 1. SECCIÓN IZQUIERDA: MENÚ Y LOGO */}
                         <div className="nav-brand">
                             {/* Botón de Menú (Hamburguesa) - Agregamos la lógica y la clase 'active' */}
-                            <button 
-                                className={"nav-toggle" + (isMenuOpen ? " active" : "")} 
+                            <button
+                                className={"nav-toggle" + (isMenuOpen ? " active" : "")}
                                 title="Menú"
-                                onClick={handleToggleMenu} 
+                                onClick={handleToggleMenu}
                             >
                                 <span /><span /><span />
                             </button>
 
                             {/* Logo */}
                             <div className="logo-content">
-                                <img 
-                                    src="app/assets/img/pokestore_logo.png" 
-                                    alt="Pokeball Logo" 
-                                    className="logo-image" 
+                                <img
+                                    src="app/assets/img/pokestore_logo.webp"
+                                    alt="Pokeball Logo"
+                                    className="logo-image"
                                 />
                                 <h1 className="logo">PokeStore</h1>
                             </div>
@@ -95,7 +96,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 
                         {/* 2. SECCIÓN CENTRAL: BARRA DE BÚSQUEDA */}
                         <div className="product-controls">
-                        <span className="search-icon" aria-hidden="true"><FaSearch /></span>
+                            <span className="search-icon" aria-hidden="true"><FaSearch /></span>
 
                             <input
                                 type="text"
@@ -106,7 +107,7 @@ function Shell({ children }: { children: React.ReactNode }) {
                                 onChange={(e) => {
                                     const val = e.target.value;
                                     setSearchText(val);
-                                        setShowSuggestions(val.trim().length > 0);
+                                    setShowSuggestions(val.trim().length > 0);
                                 }}
                                 onKeyDown={(e) => {
                                     if (e.key === "Escape") {
@@ -115,9 +116,9 @@ function Shell({ children }: { children: React.ReactNode }) {
                                 }}
                             />
 
-                                {showSuggestions && (
-                                    <SearchSuggestions searchText={searchText} onClose={() => setShowSuggestions(false)} />
-                                )}
+                            {showSuggestions && (
+                                <SearchSuggestions searchText={searchText} onClose={() => setShowSuggestions(false)} />
+                            )}
                         </div>
 
 
@@ -125,6 +126,24 @@ function Shell({ children }: { children: React.ReactNode }) {
                         <div className="nav-actions">
                             {usuarioActual ? (
                                 <>
+                                    {/* 2. AÑADIDO: Botón Dashboard para Admins (Escritorio) */}
+                                    {isAdmin && (
+                                        <NavLink
+                                            to="/admin/dashboard"
+                                            className="profile-pill"
+                                            style={{
+                                                backgroundColor: '#2c3e50',
+                                                color: 'white',
+                                                borderColor: '#2c3e50',
+                                                marginRight: '8px'
+                                            }}
+                                            title="Panel de Administración"
+                                        >
+                                            <i className="fas fa-tools" />
+                                            <span className="profile-name" style={{marginLeft: '5px'}}>Admin</span>
+                                        </NavLink>
+                                    )}
+
                                     <div className="profile-menu-wrapper">
                                         <button
                                             type="button"
@@ -165,6 +184,12 @@ function Shell({ children }: { children: React.ReactNode }) {
                     <li><NavLink to="/" end className={({ isActive }) => "nav-link" + (isActive ? " active" : "")} onClick={handleNavLinkClick}>Inicio</NavLink></li>
                     <li><NavLink to="/productos" className={({ isActive }) => "nav-link" + (isActive ? " active" : "")} onClick={handleNavLinkClick}>Pokédex</NavLink></li>
                     <li><NavLink to="/contacto" className={({ isActive }) => "nav-link" + (isActive ? " active" : "")} onClick={handleNavLinkClick}>Centro Pokémon</NavLink></li>
+
+                    {/* 3. AÑADIDO: Enlace Admin en menú móvil */}
+                    {isAdmin && (
+                        <li><NavLink to="/admin/dashboard" className={({ isActive }) => "nav-link" + (isActive ? " active" : "")} onClick={handleNavLinkClick}>Panel Admin</NavLink></li>
+                    )}
+
                     {!usuarioActual && (
                         <>
                             <li className="menu-divider"></li>
@@ -210,15 +235,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Links />
         </head>
         <body>
-            <AuthProvider>
-                <NotificationProvider>
-                    <CartProvider>
-                        <Shell>{children}</Shell>
-                    </CartProvider>
-                </NotificationProvider>
-            </AuthProvider>
-            <ScrollRestoration />
-            <Scripts />
+        <AuthProvider>
+            <NotificationProvider>
+                <CartProvider>
+                    <Shell>{children}</Shell>
+                </CartProvider>
+            </NotificationProvider>
+        </AuthProvider>
+        <ScrollRestoration />
+        <Scripts />
         </body>
         </html>
     );
@@ -229,7 +254,7 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-    return null; 
+    return null;
 }
 
 function SearchSuggestions({ searchText, onClose }: { searchText: string; onClose: () => void }) {

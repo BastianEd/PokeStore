@@ -1,256 +1,154 @@
-// app/components/organisms/AuthPanel.tsx
-import { useEffect, useState } from "react";
-import type { FormEvent } from "react";
-import { Link } from "react-router";
+import { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "~/services/auth-context";
 
 type AuthMode = "login" | "register";
 
-type Usuario = {
-    nombre: string;
-    email: string;
-    password: string;
-    tipo: "mayor" | "estudiante" | "regular";
-};
-
-const STORAGE_KEY = "ms_usuarios";
-const CURRENT_USER_KEY = "ms_usuario_actual";
-
-const DEMO_USERS: Usuario[] = [
-    {
-        nombre: "Usuario Mayor",
-        email: "mayor@gmail.com",
-        password: "password123",
-        tipo: "mayor",
-    },
-    {
-        nombre: "Estudiante Duoc",
-        email: "estudiante@duoc.cl",
-        password: "password123",
-        tipo: "estudiante",
-    },
-    {
-        nombre: "Usuario Regular",
-        email: "usuario@gmail.com",
-        password: "password123",
-        tipo: "regular",
-    },
-];
-
-function leerUsuarios(): Usuario[] {
-    if (typeof window === "undefined") return [];
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    try {
-        return JSON.parse(raw) as Usuario[];
-    } catch {
-        return [];
-    }
-}
-
-function guardarUsuarios(usuarios: Usuario[]) {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(usuarios));
-}
-
-function guardarUsuarioActual(usuario: Usuario) {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(usuario));
-}
-
 export function AuthPanel({ mode }: { mode: AuthMode }) {
+    const { login, register } = useAuth(); // Usamos las funciones reales del contexto
+    const navigate = useNavigate();
+
+    // Estados del formulario
     const [nombre, setNombre] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    // Estados de UI
     const [error, setError] = useState<string | null>(null);
-    const [message, setMessage] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
-    const esLogin = mode === "login";
+    const isLogin = mode === "login";
 
-    // Cargar usuarios demo solo una vez
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-        const raw = window.localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(DEMO_USERS));
-        }
-    }, []);
-
-    const limpiarMensajes = () => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         setError(null);
-        setMessage(null);
-    };
+        setSuccessMessage(null);
+        setLoading(true);
 
-    const manejarLogin = () => {
-        const usuarios = leerUsuarios();
-        const encontrado = usuarios.find(
-            (u) => u.email === email.trim() && u.password === password,
-        );
-
-        if (!encontrado) {
-            setError("Correo o contraseña incorrectos.");
+        // Validaciones básicas
+        if (!email.trim() || !password.trim()) {
+            setError("El correo y la contraseña son obligatorios.");
+            setLoading(false);
             return;
         }
 
-        guardarUsuarioActual(encontrado);
-
-        let extra = "";
-        if (encontrado.tipo === "mayor") {
-            extra = " (50% de descuento por edad)";
-        } else if (encontrado.tipo === "estudiante") {
-            extra = " (torta gratis en cumpleaños)";
-        }
-
-        setMessage(`Bienvenido/a, ${encontrado.nombre}${extra}`);
-    };
-
-    const manejarRegistro = () => {
-        if (!nombre.trim() || !email.trim() || !password.trim()) {
-            setError("Todos los campos son obligatorios.");
+        if (!isLogin && !nombre.trim()) {
+            setError("Por favor, ingresa tu nombre de entrenador.");
+            setLoading(false);
             return;
         }
 
-        const usuarios = leerUsuarios();
-        const yaExiste = usuarios.some(
-            (u) => u.email.toLowerCase() === email.trim().toLowerCase(),
-        );
-
-        if (yaExiste) {
-            setError("Ya existe un usuario registrado con ese correo.");
-            return;
-        }
-
-        const nuevo: Usuario = {
-            nombre: nombre.trim(),
-            email: email.trim(),
-            password,
-            tipo: "regular",
-        };
-
-        const actualizados = [...usuarios, nuevo];
-        guardarUsuarios(actualizados);
-        guardarUsuarioActual(nuevo);
-
-        setMessage("Registro exitoso. Sesión iniciada.");
-        setNombre("");
-        setEmail("");
-        setPassword("");
-    };
-
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        limpiarMensajes();
-        if (esLogin) {
-            manejarLogin();
-        } else {
-            manejarRegistro();
+        try {
+            if (isLogin) {
+                await login(email, password);
+                // Si el login no lanza error, redirigimos
+                navigate("/");
+            } else {
+                // Registro: Enviamos nombre, email y password a la API
+                await register(nombre, email, password);
+                setSuccessMessage("¡Cuenta creada con éxito! Entrando al mundo Pokémon...");
+                // Pequeña pausa para leer el mensaje antes de redirigir
+                setTimeout(() => navigate("/"), 1500);
+            }
+        } catch (err: any) {
+            // Mostramos el error que viene del auth-context (que a su vez viene de la API)
+            setError(err.message || "Ocurrió un error inesperado.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <section className="section auth-section">
-            <div className="container auth-container">
+        <section className="section active auth-section">
+            <div className="container auth-layout">
                 <div className="auth-card">
-                    <h2>{esLogin ? "Iniciar Sesión" : "Crear Cuenta"}</h2>
-                    <p className="auth-subtitle">
-                        {esLogin
-                            ? "Accede para gestionar tus pedidos y ver tus beneficios."
-                            : "Regístrate para recibir descuentos y sorpresas dulces."}
+                    <h2 className="section-title">
+                        {isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
+                    </h2>
+                    <p className="section-subtitle" style={{ textAlign: "center", marginBottom: "1.5rem", color: "#666" }}>
+                        {isLogin
+                            ? "Accede a tu PC para gestionar tus Pokémon."
+                            : "Regístrate para obtener tu Licencia de Entrenador."}
                     </p>
 
                     <form className="auth-form" onSubmit={handleSubmit}>
-                        {!esLogin && (
-                            <div className="input-group">
-                                <label htmlFor="nombre">Nombre completo</label>
+                        {/* Campo Nombre: Solo visible en Registro */}
+                        {!isLogin && (
+                            <label className="form-field">
+                                <span>Nombre de Entrenador</span>
                                 <input
-                                    id="nombre"
                                     type="text"
-                                    placeholder="Ej: Nicolás Fonseca"
+                                    name="nombre"
                                     value={nombre}
                                     onChange={(e) => setNombre(e.target.value)}
+                                    required
+                                    placeholder="Ej: Rojo, Azul, Ash..."
                                 />
-                            </div>
+                            </label>
                         )}
 
-                        <div className="input-group">
-                            <label htmlFor="email">Correo electrónico</label>
+                        <label className="form-field">
+                            <span>Correo electrónico</span>
                             <input
-                                id="email"
                                 type="email"
-                                placeholder="tucorreo@ejemplo.cl"
+                                name="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                required
+                                placeholder="entrenador@poke.com"
                             />
-                        </div>
+                        </label>
 
-                        <div className="input-group">
-                            <label htmlFor="password">Contraseña</label>
+                        <label className="form-field">
+                            <span>Contraseña</span>
                             <input
-                                id="password"
                                 type="password"
-                                placeholder="********"
+                                name="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                required
+                                placeholder="********"
                             />
-                        </div>
+                        </label>
 
-                        {error && <p className="auth-error">{error}</p>}
-                        {message && <p className="auth-success">{message}</p>}
-
-                        <button type="submit" className="btn-primary auth-submit-btn">
-                            {esLogin ? "Ingresar" : "Registrarme"}
-                        </button>
-                    </form>
-
-                    <div className="auth-switch">
-                        {esLogin ? (
-                            <p>
-                                ¿No tienes cuenta?{" "}
-                                <Link
-                                    to="/registro"
-                                    className="link-button"
-                                    onClick={limpiarMensajes}
-                                >
-                                    Crear cuenta
-                                </Link>
-                            </p>
-                        ) : (
-                            <p>
-                                ¿Ya tienes cuenta?{" "}
-                                <Link
-                                    to="/login"
-                                    className="link-button"
-                                    onClick={limpiarMensajes}
-                                >
-                                    Iniciar sesión
-                                </Link>
+                        {/* Mensajes de Feedback */}
+                        {error && (
+                            <p className="form-error" style={{ color: "#e74c3c", textAlign: "center", fontWeight: "bold" }}>
+                                {error}
                             </p>
                         )}
-                    </div>
+                        {successMessage && (
+                            <p className="form-success" style={{ color: "#27ae60", textAlign: "center", fontWeight: "bold" }}>
+                                {successMessage}
+                            </p>
+                        )}
 
-                    <div className="demo-users">
-                        <h4>👥 Usuarios de Prueba:</h4>
+                        <button type="submit" className="btn-primary auth-submit-btn" disabled={loading}>
+                            {loading
+                                ? (isLogin ? "Ingresando..." : "Registrando...")
+                                : (isLogin ? "Entrar" : "Obtener Licencia")
+                            }
+                        </button>
 
-                        <div className="demo-user">
-                            <strong>Usuario Mayor:</strong> mayor@gmail.com / password123
-                            <br />
-                            <small>Recibe 50% descuento por edad</small>
+                        <div className="auth-switch">
+                            {isLogin ? (
+                                <span>
+                                    ¿No tienes cuenta?{" "}
+                                    <Link to="/registro" className="auth-link" onClick={() => { setError(null); }}>
+                                        Crear una cuenta
+                                    </Link>
+                                </span>
+                            ) : (
+                                <span>
+                                    ¿Ya tienes cuenta?{" "}
+                                    <Link to="/login" className="auth-link" onClick={() => { setError(null); }}>
+                                        Inicia sesión
+                                    </Link>
+                                </span>
+                            )}
                         </div>
-
-                        <div className="demo-user">
-                            <strong>Estudiante Duoc:</strong> estudiante@duoc.cl /
-                            password123
-                            <br />
-                            <small>Torta gratis en cumpleaños</small>
-                        </div>
-
-                        <div className="demo-user">
-                            <strong>Usuario Regular:</strong> usuario@gmail.com /
-                            password123
-                            <br />
-                            <small>Descuentos aplicables con códigos</small>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </section>
