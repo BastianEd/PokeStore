@@ -43,17 +43,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
             const decoded: any = jwtDecode(token);
 
-            // El backend envía 'roles' en el payload.
-            // Si por alguna razón no viene como array, lo convertimos.
-            const rolesDelToken = Array.isArray(decoded.roles)
-                ? decoded.roles
-                : (decoded.roles ? [decoded.roles] : []);
+            // 1. Buscamos 'role' (lo que manda tu backend actual) O 'roles' (por si lo cambias a futuro).
+            // 2. Normalizamos para asegurar que siempre trabajamos con un Array.
+            const rawRole = decoded.role || decoded.roles;
+
+            const rolesDelToken = Array.isArray(rawRole)
+                ? rawRole
+                : (rawRole ? [rawRole] : []); // Si es string, lo envolvemos en array
 
             const usuario: Usuario = {
                 email: decoded.email || "",
-                nombre: decoded.name,
+                nombre: decoded.name, // Nota: Asegúrate que el token traiga 'name', si no, usa decoded.email
                 id: decoded.sub,
-
                 roles: rolesDelToken,
             };
 

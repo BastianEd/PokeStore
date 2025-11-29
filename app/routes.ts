@@ -9,8 +9,5 @@ export default [
     { path: "recuperar", file: "routes/forgot-password.tsx" },
     { path: "cart", file: "routes/cart.tsx" },
     { path: "perfil", file: "routes/perfil.tsx" },
-
-    // --> NUEVA RUTA ADMIN <--
-    { path: "admin/dashboard", file: "routes/admin/dashboard.tsx" },
-
+    { path: "admin/dashboard", file: "routes/admin/pokemons.tsx" },
 ] satisfies RouteConfig;

@@ -1,8 +1,6 @@
 import axios from "axios";
 
-// URL base del backend. En local suele ser localhost:3000, pero si deseas cambiarla hazlo en .env .
-// NOTA: El backend tiene versionado activado (v1, v2).
-// Las rutas de auth parecen no tener versión, pero pokemones sí.
+// URL base del backend.
 export const API_URL = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
@@ -16,7 +14,8 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         if (typeof window !== "undefined") {
-            const token = localStorage.getItem("token");
+            // CORRECCIÓN AQUÍ: Usamos "jwt_token" para coincidir con auth-context
+            const token = localStorage.getItem("jwt_token");
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
@@ -28,14 +27,16 @@ api.interceptors.request.use(
     }
 );
 
-// Interceptor: Manejo global de errores (opcional pero recomendado)
+// Interceptor: Manejo global de errores
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        // Aquí podrías detectar si el error es 401 (No autorizado) y cerrar sesión automáticamente
+        // Si el error es 401, el token venció o es inválido.
         if (error.response?.status === 401) {
-            // console.warn("Sesión expirada o inválida");
-            // window.localStorage.removeItem("token");
+            console.warn("Sesión no autorizada o expirada.");
+            // Opcional: Podrías forzar logout aquí si quisieras
+            // localStorage.removeItem("jwt_token");
+            // window.location.href = "/login";
         }
         return Promise.reject(error);
     }
