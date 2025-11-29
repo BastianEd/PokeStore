@@ -19,14 +19,6 @@ export const POKEMONS: Pokemon[] = [
         destacado: true
     },
     {
-        pokedexId: 7,
-        nombre: "Squirtle",
-        tipoPrincipal: "Agua",
-        precio: 52000,
-        descripcion: "Un pequeño Pokémon tortuga tipo Agua. Lanza chorros de agua con gran precisión.",
-        imagen: "app/assets/img/Squirtle.webp",
-    },
-    {
         pokedexId: 25,
         nombre: "Pikachu",
         tipoPrincipal: "Eléctrico",
@@ -34,22 +26,6 @@ export const POKEMONS: Pokemon[] = [
         descripcion: "La mascota de la franquicia. Un pequeño roedor eléctrico, capaz de generar fuertes descargas.",
         imagen: "app/assets/img/Pikachu.webp",
         destacado: true
-    },
-    {
-        pokedexId: 1,
-        nombre: "Bulbasaur",
-        tipoPrincipal: "Planta",
-        precio: 48000,
-        descripcion: "Pokémon tipo Planta/Veneno. Lleva una semilla en su espalda que crece con él.",
-        imagen: "app/assets/img/Bulbasaur.webp",
-    },
-    {
-        pokedexId: 143,
-        nombre: "Snorlax",
-        tipoPrincipal: "Normal",
-        precio: 60000,
-        descripcion: "Un Pokémon muy grande que es más feliz cuando duerme. Su despertar requiere una Pokeflauta.",
-        imagen: "app/assets/img/Snorlax.webp",
     },
     {
         pokedexId: 6,

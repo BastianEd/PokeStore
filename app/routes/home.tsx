@@ -74,7 +74,7 @@ export default function Home() {
                         {/* Imagen Pokéball en el hero */}
                         <div className="hero-image">
                             <img
-                                src={new URL("../assets/img/pokeball.webp", import.meta.url).href}
+                                src={("https://i.ibb.co/6cB613zT/logo-hero-pokestore.webp")}
                                 alt="Pokéball"
                                 style={{
                                     maxWidth: "85%",

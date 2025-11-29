@@ -1,4 +1,5 @@
 /* === VARIABLES PERSONALIZADAS PARA POKÉMON TRADING CO. === */
+@import "tailwindcss";
 :root {
     /* Colores primarios (Pokeball theme) */
     --color-rojo-poke: #CC0000;      /* Rojo principal */
