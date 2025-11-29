@@ -15,7 +15,7 @@ export const POKEMONS: Pokemon[] = [
         tipoPrincipal: "Fuego",
         precio: 50000,
         descripcion: "Un Pokémon tipo Fuego, ideal para entrenadores principiantes. Su llama en la cola indica su salud.",
-        imagen: "app/assets/img/Charmander.webp",
+        imagen: "https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/detail/004.png",
         destacado: true
     },
     {
@@ -24,7 +24,7 @@ export const POKEMONS: Pokemon[] = [
         tipoPrincipal: "Eléctrico",
         precio: 75000,
         descripcion: "La mascota de la franquicia. Un pequeño roedor eléctrico, capaz de generar fuertes descargas.",
-        imagen: "app/assets/img/Pikachu.webp",
+        imagen: "https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/detail/025.png",
         destacado: true
     },
     {
@@ -33,7 +33,7 @@ export const POKEMONS: Pokemon[] = [
         tipoPrincipal: "Fuego",
         precio: 95000,
         descripcion: "Forma final de Charmander. Un dragón que escupe fuego con gran poder destructivo. Solo para entrenadores avanzados.",
-        imagen: "app/assets/img/Charizard.webp",
+        imagen: "https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/detail/006.png",
         destacado: true
     },
 ];

@@ -85,7 +85,7 @@ function Shell({ children }: { children: React.ReactNode }) {
                             {/* Logo */}
                             <div className="logo-content">
                                 <img
-                                    src="app/assets/img/pokestore_logo.webp"
+                                    src="https://upload.wikimedia.org/wikipedia/commons/5/51/Pokebola-pokeball-png-0.png"
                                     alt="Pokeball Logo"
                                     className="logo-image"
                                 />
