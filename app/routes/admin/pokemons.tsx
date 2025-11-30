@@ -105,6 +105,8 @@ export default function AdminPokemons() {
     return (
         // LAYOUT: Centrado, fondo gris suave, padding superior para el header
         <div className="min-h-screen bg-gray-50 flex flex-col items-center pt-28 pb-12 px-4">
+            {/* Espaciador para separar del header fijo */}
+            <div className="w-full h-4 md:h-6 lg:h-6"></div>
 
             {/* Contenedor ancho limitado */}
             <div className="w-full max-w-6xl space-y-8">
