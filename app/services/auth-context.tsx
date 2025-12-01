@@ -28,7 +28,7 @@ interface AuthContextValue extends AuthState {
     register: (nombre: string, email: string, password: string) => Promise<void>;
     logout: () => void;
     isAdmin: boolean;
-    agregarCompras: (items: Array<Record<string, any>>) => void;
+    agregarCompras: (items: Array<Record<string, any>>) => { id: number; fecha: string; items: Array<Record<string, any>> } | null;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const usuario = state.usuarioActual;
         if (!usuario) {
             console.warn("agregarCompras: no hay usuario autenticado");
-            return;
+            return null;
         }
 
         try {
@@ -135,8 +135,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             const updated = [...existing, nuevaCompra];
             localStorage.setItem(key, JSON.stringify(updated));
+
+            return nuevaCompra;
         } catch (error) {
             console.error("Error guardando compras locales:", error);
+            return null;
         }
     };
 
