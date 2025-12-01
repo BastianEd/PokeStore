@@ -6,6 +6,7 @@ import { useAuth } from "~/services/auth-context";
 import { useNavigate } from "react-router";
 import { FiEdit2, FiTrash2, FiSave, FiX, FiPlus } from "react-icons/fi";
 import { useNotification } from "~/services/notification-context"; 
+import { Link } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
     return [{ title: "Administración de Pokemones" }];
@@ -138,6 +139,15 @@ export default function AdminPokemons() {
                         </div>
                         <span>{loadingData ? 'Conectando...' : 'Generar Pokémon (Seed)'}</span>
                     </button>
+
+                    {/* Acceso rápido al historial de ventas */}
+                    <Link
+                        to="/admin/ventas"
+                        className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-full font-bold shadow-lg hover:shadow-xl transition-all"
+                        title="Ver historial de ventas"
+                    >
+                        Historial de Ventas
+                    </Link>
                 </div>
 
                 {/* TABLA DE DATOS */}
