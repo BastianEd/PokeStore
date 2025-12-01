@@ -5,6 +5,7 @@ import type { Pokemon } from "~/data/products";
 import { useAuth } from "~/services/auth-context";
 import { useNavigate } from "react-router";
 import { FiEdit2, FiTrash2, FiSave, FiX, FiPlus } from "react-icons/fi";
+import { useNotification } from "~/services/notification-context"; 
 
 export function meta({}: Route.MetaArgs) {
     return [{ title: "Administración de Pokemones" }];
@@ -16,6 +17,8 @@ const btnActionStyle = "p-2 rounded-full transition-colors shadow-sm hover:shado
 export default function AdminPokemons() {
     const { isAdmin, isLoading } = useAuth();
     const navigate = useNavigate();
+    // Obtenemos la función para mostrar notificaciones
+    const { showNotification } = useNotification(); 
 
     // Estado de datos
     const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -56,8 +59,8 @@ export default function AdminPokemons() {
             setLoadingData(true);
             await ProductService.seed();
             await loadData(); // Recargamos para mostrar el nuevo
-            // Opcional: Feedback sutil
-            // alert("¡Pokémon capturado y registrado!");
+            // Notificación de éxito
+            showNotification("¡20 nuevos Pokémon han sido generados y añadidos al inventario! 🐾");
         } catch (e) {
             alert("No se pudo agregar. Verifica si el servicio de PokéAPI está disponible.");
         } finally {
@@ -71,8 +74,10 @@ export default function AdminPokemons() {
 
         try {
             await ProductService.delete(id);
-            // Actualización optimista (borramos de la lista visualmente)
+            // Actualización (borramos de la lista visualmente)
             setPokemons(prev => prev.filter(p => p.pokedexId !== id));
+            // Notificación de éxito
+            showNotification(`Pokémon #${id} ha sido liberado del inventario. 🗑️`);
         } catch (e) {
             alert("Error al eliminar el Pokémon.");
         }
@@ -95,6 +100,8 @@ export default function AdminPokemons() {
             await ProductService.update(id, editForm);
             setEditingId(null);
             loadData(); // Recargamos para asegurar datos frescos
+            // Notificación de éxito
+            showNotification(`Pokémon #${id} actualizado correctamente. 📝`);
         } catch (e) {
             alert("Error al guardar los cambios.");
         }
