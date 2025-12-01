@@ -139,36 +139,35 @@ export default function CartPage() {
                     </div>
                 )}
                 {lastPurchase && (
-                    <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', zIndex: 1000 }}>
-                        <div style={{ width: 'min(820px, 95%)', maxHeight: '90vh', overflowY: 'auto', background: '#fff', padding: '1.25rem', borderRadius: 12 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                <h3 style={{ margin: 0 }}>Boleta de Compra #{lastPurchase.id}</h3>
-                                <div style={{ display: 'flex', gap: 8 }}>
-                                    <strong style={{ color: '#333', alignSelf: 'center' }}>{new Date(lastPurchase.fecha).toLocaleString('es-CL')}</strong>
+                    <div className="receipt-overlay" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', zIndex: 1000 }}>
+                        <div className="receipt-container" style={{ width: 'min(820px, 95%)', maxHeight: '90vh', overflowY: 'auto', background: '#fff', padding: '1.25rem', borderRadius: 12 }}>
+                            <div className="receipt-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                                <h3 className="receipt-title" style={{ margin: 0 }}>Boleta de Compra #{lastPurchase.id}</h3>
+                                <div className="receipt-meta" style={{ display: 'flex', gap: 8 }}>
+                                    <strong className="receipt-date" style={{ color: '#333', alignSelf: 'center' }}>{new Date(lastPurchase.fecha).toLocaleString('es-CL')}</strong>
                                     <button className="btn-secondary" onClick={() => setLastPurchase(null)}>Cerrar</button>
                                 </div>
                             </div>
 
-                            <div>
+                            <div className="receipt-items">
                                 {(lastPurchase.items || []).map((it: any) => (
-                                    <div key={it.pokedexId} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid #f0f0f0' }}>
-                                        <img src={it.imagen} alt={it.nombre} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8 }} />
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontWeight: 700 }}>{it.nombre}</div>
-                                            <div style={{ color: '#666' }}>{it.tipoPrincipal}</div>
+                                    <div key={it.pokedexId} className="receipt-item" style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid #f0f0f0' }}>
+                                        <img src={it.imagen} alt={it.nombre} className="receipt-img" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8 }} />
+                                        <div className="receipt-info" style={{ flex: 1 }}>
+                                            <div className="receipt-name" style={{ fontWeight: 700 }}>{it.nombre}</div>
+                                            <div className="receipt-type" style={{ color: '#666' }}>{it.tipoPrincipal}</div>
                                         </div>
-                                        <div style={{ textAlign: 'right' }}>
-                                            <div>{it.quantity} × {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(it.precio)}</div>
-                                            <div style={{ fontWeight: 700 }}>{new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format((it.precio ?? 0) * (it.quantity ?? 1))}</div>
+                                        <div className="receipt-price" style={{ textAlign: 'right' }}>
+                                            <div className="receipt-line">{it.quantity} × {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(it.precio)}</div>
+                                            <div className="receipt-subtotal" style={{ fontWeight: 700 }}>{new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format((it.precio ?? 0) * (it.quantity ?? 1))}</div>
                                         </div>
                                     </div>
                                 ))}
-
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <div style={{ color: '#666' }}>Total</div>
-                                        <div style={{ fontSize: '1.125rem', fontWeight: 800 }}>{new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format((lastPurchase.items || []).reduce((s: number, it: any) => s + (it.precio ?? 0) * (it.quantity ?? 1), 0))}</div>
-                                    </div>
+                            </div>
+                            <div className="receipt-total-row" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
+                                <div className="receipt-total-box" style={{ textAlign: 'right' }}>
+                                    <div className="receipt-total-label" style={{ color: '#666' }}>Total</div>
+                                    <div className="receipt-total-value" style={{ fontSize: '1.125rem', fontWeight: 800 }}>{new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format((lastPurchase.items || []).reduce((s: number, it: any) => s + (it.precio ?? 0) * (it.quantity ?? 1), 0))}</div>
                                 </div>
                             </div>
                         </div>

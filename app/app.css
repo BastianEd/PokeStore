@@ -404,6 +404,23 @@ img {
     color: white;
 }
 
+/* Admin pill (visible en desktop, oculto en móvil) */
+.admin-pill {
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: var(--color-azul-poke);
+    color: #fff;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    box-shadow: var(--shadow-suave);
+    border: 1px solid var(--color-dorado);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+}
+ .admin-pill:hover { background: var(--color-rojo-poke); }
+
 .profile-menu-wrapper {
     position: relative;
 }
@@ -750,6 +767,23 @@ img {
     }
     .nav-actions { gap: 0.4rem; }
     .cart-btn { width: 40px; height: 40px; padding: 8px; }
+}
+
+/* Ajustes específicos para la boleta solo en pantallas pequeñas (<=600px) */
+@media (max-width: 600px) {
+    .receipt-container { padding: 0.9rem !important; }
+    .receipt-header { flex-direction: column; align-items: flex-start !important; gap: 0.4rem; }
+    .receipt-meta { width: 100%; justify-content: space-between; }
+    .receipt-items { margin-top: 0.25rem; }
+    .receipt-item { padding: 0.6rem 0 !important; gap: 0.7rem !important; }
+    .receipt-img { width: 56px !important; height: 56px !important; }
+    .receipt-name { font-size: 0.95rem; }
+    .receipt-type { font-size: 0.7rem; }
+    .receipt-price { min-width: 90px; }
+    .receipt-line { font-size: 0.7rem; color: #444; }
+    .receipt-subtotal { font-size: 0.8rem; }
+    .receipt-total-row { margin-top: 0.75rem !important; }
+    .receipt-total-value { font-size: 1rem !important; }
 }
 
 /* Evitar cualquier scroll cuando el menú está abierto */
