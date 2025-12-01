@@ -28,6 +28,7 @@ interface AuthContextValue extends AuthState {
     register: (nombre: string, email: string, password: string) => Promise<void>;
     logout: () => void;
     isAdmin: boolean;
+    agregarCompras: (items: Array<Record<string, any>>) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -113,11 +114,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         window.location.href = "/login";
     };
 
+    // Guarda compras simples en localStorage por usuario (demo local)
+    const agregarCompras = (items: Array<Record<string, any>>) => {
+        const usuario = state.usuarioActual;
+        if (!usuario) {
+            console.warn("agregarCompras: no hay usuario autenticado");
+            return;
+        }
+
+        try {
+            const key = `compras_user_${usuario.id}`;
+            const raw = localStorage.getItem(key);
+            const existing = raw ? (JSON.parse(raw) as any[]) : [];
+
+            const nuevaCompra = {
+                id: Date.now(),
+                fecha: new Date().toISOString(),
+                items,
+            };
+
+            const updated = [...existing, nuevaCompra];
+            localStorage.setItem(key, JSON.stringify(updated));
+        } catch (error) {
+            console.error("Error guardando compras locales:", error);
+        }
+    };
+
     // Calculamos si es admin basándonos únicamente en los roles del usuario autenticado
     const isAdmin = state.usuarioActual?.roles.includes("admin") ?? false;
 
     return (
-        <AuthContext.Provider value={{ ...state, login, register, logout, isAdmin }}>
+        <AuthContext.Provider value={{ ...state, login, register, logout, isAdmin, agregarCompras }}>
             {children}
         </AuthContext.Provider>
     );
