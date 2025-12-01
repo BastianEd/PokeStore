@@ -1231,6 +1231,14 @@ img {
     align-items: start;
 }
 
+/* Grid específico usado en la página de carrito para separar los items entre sí */
+.cart-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md); /* separación reducida ligeramente */
+    margin-bottom: var(--spacing-lg);
+}
+
 .cart-items {
     display: flex;
     flex-direction: column;
@@ -1239,12 +1247,18 @@ img {
 
 .cart-item {
     background: white;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md); /* espacio interno reducido aún más */
     border-radius: 15px;
     box-shadow: var(--shadow-suave);
     display: flex;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md); /* separación interna reducida */
     align-items: center;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.cart-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-media);
 }
 
 .cart-item-image {
