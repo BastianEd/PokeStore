@@ -110,6 +110,8 @@ img {
     gap: 1rem; 
     width: 100%;
     padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 0; /* permitir que hijos se encojan sin forzar overflow */
+    min-width: 0; /* permitir que hijos se encojan sin forzar overflow */
 }
 
 /* ------------------------------------------------ */
@@ -347,6 +349,7 @@ img {
     gap: 1rem;
     margin: 0;
     flex-shrink: 0;
+    min-width: 0; /* permitir truncado dentro del contenedor */
 }
 
 .profile-pill {
@@ -362,6 +365,28 @@ img {
     text-decoration: none;
     transition: all 0.2s ease;
     white-space: nowrap;
+    white-space: nowrap;
+}
+
+/* Truncar el texto del perfil para evitar overflow horizontal */
+.profile-pill .profile-name {
+    display: inline-block;
+    max-width: 10rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+    vertical-align: middle;
+}
+
+/* Truncar el texto del perfil para evitar overflow horizontal */
+.profile-pill .profile-name {
+    display: inline-block;
+    max-width: 10rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
 .profile-pill .fas {
@@ -691,6 +716,45 @@ img {
 #app-wrapper.menu-open::before {
     opacity: 1;
     visibility: visible;
+}
+
+/* Evitar scroll cuando el menú está abierto */
+#app-wrapper.menu-open {
+    overflow: hidden;
+}
+
+/* ===== Responsive header tweaks ===== */
+@media (max-width: 768px) {
+    .navbar .container {
+        gap: 0.5rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    .nav-brand {
+        gap: 0.5rem;
+    }
+    .logo-content .logo-image { width: 32px; height: 32px; }
+    .logo { font-size: 1.4rem; }
+    .nav-actions { gap: 0.5rem; }
+
+    /* Ocultar nombre/email en el pill en móviles para evitar overflow */
+    .profile-pill .profile-name { display: none; }
+
+    /* Ocultar el acceso directo al Panel Admin solo en móviles */
+    .admin-pill { display: none; }
+}
+
+@media (max-width: 480px) {
+    .navbar .container {
+        gap: 0.4rem;
+        padding: var(--spacing-xs);
+    }
+    .nav-actions { gap: 0.4rem; }
+    .cart-btn { width: 40px; height: 40px; padding: 8px; }
+}
+
+/* Evitar cualquier scroll cuando el menú está abierto */
+#app-wrapper.menu-open {
+    overflow: hidden;
 }
 
 /* Layout para mantener el footer pegado abajo */

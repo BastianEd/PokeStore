@@ -130,7 +130,7 @@ function Shell({ children }: { children: React.ReactNode }) {
                                     {isAdmin && (
                                         <NavLink
                                             to="/admin/dashboard"
-                                            className="profile-pill"
+                                            className="profile-pill admin-pill"
                                             style={{
                                                 backgroundColor: '#2c3e50',
                                                 color: 'white',
