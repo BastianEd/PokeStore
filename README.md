@@ -48,6 +48,16 @@ Asegúrate de tener instalado [Node.js](https://nodejs.org/) (versión 18 o supe
     npm install
     ```
 
+### Configuración del Entorno (.env) 🌐
+
+Para que el frontend pueda comunicarse con la API del backend, debes definir la URL del servicio.
+
+**Crea un archivo llamado `.env` en la raíz del proyecto** con el siguiente contenido:
+
+```bash
+VITE_API_URL=http://localhost:3000/
+```
+
 ### Ejecución
 
 Para iniciar el servidor de desarrollo, ejecuta el siguiente comando:
