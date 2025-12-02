@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { Button } from "~/components/atoms/Button"; // Importación directa con alias
+import { Button } from "~/components/atoms/Button";
 
 describe("Atom: Button", () => {
     it("debería renderizar el texto correctamente", () => {
@@ -20,8 +20,8 @@ describe("Atom: Button", () => {
 
     it("debería estar deshabilitado cuando la prop disabled es true", () => {
         render(<Button disabled>Disabled</Button>);
-        // Buscamos el elemento botón más cercano por si Antd anida spans
-        const button = screen.getByText("Disabled").closest('button');
+        // Ant Design suele poner el atributo disabled en el botón nativo interno
+        const button = screen.getByRole("button", { name: /disabled/i });
         expect(button).toBeDisabled();
     });
 });

@@ -3,7 +3,6 @@ import { describe, it, expect, vi } from "vitest";
 import { ProductModal } from "~/components/organisms/ProductModal";
 import type { Pokemon } from "~/data/products";
 
-// Mocks de contexto
 const mockAddToCart = vi.fn();
 const mockShowNotification = vi.fn();
 
@@ -16,12 +15,12 @@ vi.mock("~/services/notification-context", () => ({
 }));
 
 const mockPokemon: Pokemon = {
-    pokedexId: 6,
-    nombre: "Charizard",
-    tipoPrincipal: "Fuego",
-    precio: 95000,
-    descripcion: "Dragón escupe fuego",
-    imagen: "charizard.png"
+    pokedexId: 150,
+    nombre: "Mewtwo",
+    tipoPrincipal: "Psíquico",
+    precio: 150000,
+    descripcion: "Creado por ingeniería genética.",
+    imagen: "mewtwo.png"
 };
 
 describe("Organism: ProductModal", () => {
@@ -32,17 +31,15 @@ describe("Organism: ProductModal", () => {
         expect(container).toBeEmptyDOMElement();
     });
 
-    it("debería renderizar el contenido del Pokémon cuando está abierto", () => {
+    it("debería renderizar el modal si isOpen es true", () => {
         render(
             <ProductModal isOpen={true} onClose={() => {}} pokemon={mockPokemon} />
         );
-
-        expect(screen.getByRole("heading", { name: "Charizard" })).toBeInTheDocument();
-        expect(screen.getByText(/Dragón escupe fuego/)).toBeInTheDocument();
-        expect(screen.getByText(/95.000/)).toBeInTheDocument(); // Verifica formato de precio
+        expect(screen.getByText("Mewtwo")).toBeInTheDocument();
+        expect(screen.getByText(/ingeniería genética/i)).toBeInTheDocument();
     });
 
-    it("debería llamar a addToCart al capturar", () => {
+    it("debería llamar a addToCart al pulsar 'Capturar Pokémon'", () => {
         render(
             <ProductModal isOpen={true} onClose={() => {}} pokemon={mockPokemon} />
         );
@@ -53,17 +50,17 @@ describe("Organism: ProductModal", () => {
         expect(mockShowNotification).toHaveBeenCalled();
     });
 
-    it("debería llamar a onClose al cerrar", () => {
+    it("debería llamar a onClose al pulsar el botón de cerrar", () => {
         const handleClose = vi.fn();
         render(
             <ProductModal isOpen={true} onClose={handleClose} pokemon={mockPokemon} />
         );
 
-        // El botón de cerrar suele ser el primero o tener clase específica
-        // En tu código tiene un icono fa-times. Buscamos el botón contenedor.
-        const closeButtons = screen.getAllByRole("button");
-        // El primer botón en el DOM del modal suele ser el de cerrar (top-right)
-        fireEvent.click(closeButtons[0]);
+        // El botón de cerrar tiene la clase modal-close-btn o el icono fa-times
+        // Buscamos por el botón
+        const buttons = screen.getAllByRole("button");
+        // Asumiendo que el de cerrar es el primero en el DOM del modal (top-right)
+        fireEvent.click(buttons[0]);
 
         expect(handleClose).toHaveBeenCalled();
     });

@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from "vitest";
 import { ProductCard } from "~/components/molecules/ProductCard";
 import type { Pokemon } from "~/data/products";
 
-// Mock de los hooks del contexto
+// 1. Mockeamos los hooks que usa el componente
 const mockAddToCart = vi.fn();
 const mockShowNotification = vi.fn();
 
@@ -19,6 +19,7 @@ vi.mock("~/services/notification-context", () => ({
     })
 }));
 
+// Datos de prueba
 const mockPokemon: Pokemon = {
     pokedexId: 25,
     nombre: "Pikachu",
@@ -33,11 +34,11 @@ describe("Molecule: ProductCard", () => {
         render(<ProductCard pokemon={mockPokemon} onView={() => {}} />);
 
         expect(screen.getByText("Pikachu")).toBeInTheDocument();
-        // Usamos regex flexible para el precio
+        // Usamos una expresión regular flexible para el precio por el formato de moneda
         expect(screen.getByText(/5.000/)).toBeInTheDocument();
     });
 
-    it("debería llamar a addToCart al hacer click en Capturar", () => {
+    it("debería llamar a addToCart y showNotification al hacer click en Capturar", () => {
         render(<ProductCard pokemon={mockPokemon} onView={() => {}} />);
 
         const btnCapturar = screen.getByRole("button", { name: /capturar/i });
@@ -47,7 +48,7 @@ describe("Molecule: ProductCard", () => {
         expect(mockShowNotification).toHaveBeenCalled();
     });
 
-    it("debería llamar a onView al hacer click en el ojo", () => {
+    it("debería llamar a onView al hacer click en el ojo (Ver ficha)", () => {
         const handleView = vi.fn();
         render(<ProductCard pokemon={mockPokemon} onView={handleView} />);
 

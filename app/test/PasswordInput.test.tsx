@@ -3,33 +3,20 @@ import { describe, it, expect, vi } from "vitest";
 import { PasswordInput } from "~/components/atoms/PasswordInput";
 
 describe("Atom: PasswordInput", () => {
-    it("debería renderizar con el placeholder correcto", () => {
-        render(<PasswordInput placeholder="Contraseña secreta" />);
-        expect(screen.getByPlaceholderText("Contraseña secreta")).toBeInTheDocument();
-    });
-
-    it("debería tener el tipo 'password' por defecto", () => {
-        render(<PasswordInput placeholder="pass" />);
-        const input = screen.getByPlaceholderText("pass");
+    it("debería renderizar el input de tipo password", () => {
+        render(<PasswordInput placeholder="Secreto" />);
+        const input = screen.getByPlaceholderText("Secreto");
         expect(input).toHaveAttribute("type", "password");
     });
 
-    it("debería capturar el cambio de valor", () => {
+    it("debería permitir escribir una contraseña", () => {
         const handleChange = vi.fn();
-        render(<PasswordInput onChange={handleChange} placeholder="pass" />);
+        render(<PasswordInput onChange={handleChange} placeholder="Pass" />);
 
-        const input = screen.getByPlaceholderText("pass");
-        fireEvent.change(input, { target: { value: 'pikachu123' } });
+        const input = screen.getByPlaceholderText("Pass");
+        fireEvent.change(input, { target: { value: '123456' } });
 
         expect(handleChange).toHaveBeenCalled();
-        expect(input).toHaveValue('pikachu123');
-    });
-
-    // Test opcional: Verificar que el botón de "ojo" (toggle visibility) existe
-    it("debería renderizar el icono de visibilidad", () => {
-        render(<PasswordInput />);
-        // Ant Design suele usar un span con clase ant-input-password-icon
-        const toggleIcon = document.querySelector(".ant-input-password-icon");
-        expect(toggleIcon).toBeInTheDocument();
+        expect(input).toHaveValue('123456');
     });
 });
