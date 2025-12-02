@@ -1,5 +1,3 @@
-// app/services/auth-local.ts
-
 // Usuario guardado localmente
 export interface LocalUser {
     id: number;
