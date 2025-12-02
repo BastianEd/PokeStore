@@ -14,6 +14,7 @@ export default function AdminGraficos() {
   const navigate = useNavigate();
   const [ventas, setVentas] = useState<SaleRecord[]>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !isAdmin) navigate("/");
@@ -22,7 +23,26 @@ export default function AdminGraficos() {
   useEffect(() => {
     if (!isAdmin) return;
     setLoading(true);
-    SalesService.getAll().then(setVentas).finally(() => setLoading(false));
+    SalesService.getAll()
+      .then(data => {
+        setVentas([...data]); // clonar para garantizar nueva referencia
+        // Debug: console.log("[Graficos] Carga inicial ventas:", data.length);
+      })
+      .finally(() => setLoading(false));
+  }, [isAdmin]);
+
+  // Escuchar evento personalizado para refrescar ventas sin recargar la página
+  useEffect(() => {
+    if (!isAdmin) return;
+    const handler = (e: Event) => {
+      // Debug: console.log('[Graficos] Evento ventas:actualizado recibido', e);
+      SalesService.getAll().then(data => {
+        setVentas([...data]);
+        // Debug: console.log('[Graficos] Ventas tras evento:', data.length);
+      });
+    };
+    window.addEventListener('ventas:actualizado', handler);
+    return () => window.removeEventListener('ventas:actualizado', handler);
   }, [isAdmin]);
 
   if (!isAdmin) return null;
@@ -35,8 +55,41 @@ export default function AdminGraficos() {
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 font-[var(--font-encabezados)]">Gráficos</h1>
           <p className="text-gray-500">Visualización resumida de los 5 Pokémon más vendidos.</p>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm relative">
+          {refreshing && (
+            <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center text-xs text-gray-600">
+              Actualizando...
+            </div>
+          )}
           <TopSellingChart sales={ventas} top={5} showImages={false} />
+        </div>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => {
+              setRefreshing(true);
+              SalesService.getAll()
+                .then(data => {
+                  setVentas([...data]);
+                  // Debug: console.log('[Graficos] Manual refresh ventas:', data.length);
+                })
+                .finally(() => setRefreshing(false));
+            }}
+            className="text-xs px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors disabled:opacity-50"
+            title="Refrescar datos"
+            disabled={refreshing}
+          >
+            {refreshing ? '...' : 'Refrescar'}
+          </button>
+          <button
+            onClick={() => {
+              // Forzar re-render incluso si datos iguales
+              setVentas(v => [...v]);
+            }}
+            className="text-xs px-3 py-1 rounded bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors"
+            title="Forzar re-render"
+          >
+            Re-render
+          </button>
         </div>
         {loading && (
           <div className="text-center text-sm text-gray-500">Cargando datos...</div>

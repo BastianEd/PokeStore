@@ -15,10 +15,11 @@ import "./app.css";
 import { CartProvider } from "~/services/cart-context";
 import { AuthProvider, useAuth } from "~/services/auth-context";
 import { NotificationProvider } from "~/services/notification-context";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { FaSearch } from "react-icons/fa";
 import { POKEMONS, type Pokemon } from "~/data/products";
+import { ProductService } from "~/services/product.service";
 
 export const links: Route.LinksFunction = () => [
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -115,6 +116,29 @@ function Shell({ children }: { children: React.ReactNode }) {
                                     }
                                 }}
                             />
+                            {searchText && (
+                                <button
+                                    type="button"
+                                    onClick={() => { setSearchText(''); setShowSuggestions(false); }}
+                                    className="clear-search-btn"
+                                    style={{
+                                        position: 'absolute',
+                                        right: '8px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        background: '#e2e8f0',
+                                        border: 'none',
+                                        padding: '2px 6px',
+                                        borderRadius: 6,
+                                        fontSize: '0.7rem',
+                                        cursor: 'pointer',
+                                        color: '#334155'
+                                    }}
+                                    title="Limpiar búsqueda"
+                                >
+                                    ×
+                                </button>
+                            )}
 
                             {showSuggestions && (
                                 <SearchSuggestions searchText={searchText} onClose={() => setShowSuggestions(false)} />
@@ -259,26 +283,84 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
 function SearchSuggestions({ searchText, onClose }: { searchText: string; onClose: () => void }) {
     const term = searchText.trim().toLowerCase();
+    const [allProducts, setAllProducts] = useState<Pokemon[]>(POKEMONS); // Fallback inicial
+    const [loaded, setLoaded] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // Carga perezosa de todos los Pokémon desde backend una sola vez
+    useEffect(() => {
+        if (loaded) return; // evitar múltiples fetch
+        let mounted = true;
+        ProductService.getAll()
+            .then(data => {
+                if (!mounted) return;
+                // Mezclar estáticos (para imágenes/tipos especiales) si se desea evitar duplicados
+                const mergedMap = new Map<number, Pokemon>();
+                for (const p of data) mergedMap.set(p.pokedexId, p);
+                for (const p of POKEMONS) {
+                    if (!mergedMap.has(p.pokedexId)) mergedMap.set(p.pokedexId, p);
+                }
+                setAllProducts(Array.from(mergedMap.values()));
+                setLoaded(true);
+            })
+            .catch(e => {
+                if (!mounted) return;
+                setError("No se pudo cargar catálogo completo. Mostrando lista parcial.");
+                setLoaded(true);
+            });
+        return () => { mounted = false; };
+    }, [loaded]);
+
     const results = useMemo(() => {
         if (!term) return [] as Pokemon[];
-        return POKEMONS.filter(p =>
-            p.nombre.toLowerCase().includes(term)
-        ).slice(0, 6);
-    }, [term]);
+        return allProducts
+            .filter(p => p.nombre.toLowerCase().includes(term))
+            .slice(0, 6); // ampliar a 6 resultados
+    }, [term, allProducts]);
 
     if (results.length === 0) return null;
 
     return (
         <div className="search-suggestions" role="listbox">
+            {error && (
+                <div className="suggestion-error" style={{ padding: '4px 8px', fontSize: '0.7rem', color: '#b91c1c' }}>
+                    {error}
+                </div>
+            )}
             {results.map((p) => (
-                <a key={p.pokedexId} href={`/productos?q=${encodeURIComponent(p.nombre)}&exact=1#${p.pokedexId}`} className="suggestion-card" role="option" onClick={onClose}>
+                <Link
+                    key={p.pokedexId}
+                    to={`/productos?q=${encodeURIComponent(p.nombre)}&exact=1#${p.pokedexId}`}
+                    className="suggestion-card"
+                    role="option"
+                    onClick={onClose}
+                >
                     <img src={p.imagen} alt={p.nombre} className="suggestion-image img-no-white" />
                     <div className="suggestion-info">
                         <strong className="suggestion-name">{p.nombre}</strong>
                         <span className="suggestion-type">{p.tipoPrincipal}</span>
                     </div>
-                </a>
+                </Link>
             ))}
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, padding: '4px 8px' }}>
+                <Link
+                    to="/productos"
+                    onClick={onClose}
+                    style={{ fontSize: '0.65rem', color: '#0369a1', textDecoration: 'underline' }}
+                >
+                    Ver todos
+                </Link>
+                <button
+                    type="button"
+                    onClick={() => { onClose(); /* No navegamos, solo cerramos */ }}
+                    style={{ fontSize: '0.65rem', color: '#64748b', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                >
+                    Cerrar
+                </button>
+            </div>
+            {!loaded && (
+                <div style={{ padding: '6px 8px', fontSize: '0.65rem', color: '#555' }}>Cargando catálogo completo...</div>
+            )}
         </div>
     );
 }

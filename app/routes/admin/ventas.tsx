@@ -52,14 +52,15 @@ export default function AdminVentas() {
 
         <div className="bg-white rounded-b-lg border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            {/* Hacemos la tabla más ancha y sin saltos para favorecer el scroll horizontal en móvil */}
+            <table className="min-w-[1000px] md:min-w-[1100px] text-left">
               <thead className="bg-gray-50/80 border-b border-gray-100">
                 <tr className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  <th className="px-6 py-4">Compra</th>
-                  <th className="px-6 py-4">Fecha</th>
-                  <th className="px-6 py-4">Usuario</th>
-                  <th className="px-6 py-4 text-right">Ítems</th>
-                  <th className="px-6 py-4 text-right">Total</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Compra</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Fecha</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Usuario</th>
+                  <th className="px-6 py-4 text-right whitespace-nowrap">Ítems</th>
+                  <th className="px-6 py-4 text-right whitespace-nowrap">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -78,11 +79,11 @@ export default function AdminVentas() {
                   const total = v.items.reduce((sum, it) => sum + it.precio * it.quantity, 0);
                   return (
                     <tr key={`${v.userId}-${v.id}`} className="hover:bg-gray-50/60">
-                      <td className="px-6 py-4 font-semibold text-gray-800">#{v.id}</td>
-                      <td className="px-6 py-4 text-gray-600">{new Date(v.fecha).toLocaleString("es-CL")}</td>
-                      <td className="px-6 py-4 text-gray-600">Usuario #{v.userId}</td>
-                      <td className="px-6 py-4 text-right font-medium">{count}</td>
-                      <td className="px-6 py-4 text-right font-bold text-green-700">
+                      <td className="px-6 py-4 font-semibold text-gray-800 whitespace-nowrap">#{v.id}</td>
+                      <td className="px-6 py-4 text-gray-600 whitespace-nowrap">{new Date(v.fecha).toLocaleString("es-CL")}</td>
+                      <td className="px-6 py-4 text-gray-600 whitespace-nowrap">Usuario #{v.userId}</td>
+                      <td className="px-6 py-4 text-right font-medium whitespace-nowrap">{count}</td>
+                      <td className="px-6 py-4 text-right font-bold text-green-700 whitespace-nowrap">
                         {new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(total)}
                       </td>
                     </tr>

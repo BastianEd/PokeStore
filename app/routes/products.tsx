@@ -110,6 +110,49 @@ export default function Productos() {
             <div className="container">
                 <h2 className="section-title">Pokédex</h2>
 
+                {/* Barra contextual de búsqueda activa */}
+                {search.trim() !== "" && (
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '1rem',
+                        padding: '0.75rem 1rem',
+                        background: '#f0f9ff',
+                        border: '1px solid #bae6fd',
+                        borderRadius: 8,
+                        marginBottom: '1rem'
+                    }}>
+                        <span style={{ fontSize: '0.85rem', color: '#0369a1' }}>
+                            Mostrando resultados para: <strong>{search}</strong>
+                        </span>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                // Limpiar parámetro q de la URL y estado local
+                                const params = new URLSearchParams(location.search);
+                                params.delete('q');
+                                params.delete('exact');
+                                const newSearch = params.toString();
+                                const newUrl = newSearch ? `/productos?${newSearch}` : '/productos';
+                                window.history.replaceState({}, '', newUrl);
+                                setSearch('');
+                            }}
+                            style={{
+                                background: '#0284c7',
+                                color: '#fff',
+                                fontSize: '0.75rem',
+                                padding: '0.45rem 0.75rem',
+                                borderRadius: 6,
+                                border: 'none',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Mostrar todos
+                        </button>
+                    </div>
+                )}
+
                 <div className="filters">
                     <button
                         className={"filter-btn" + (tipoSeleccionado === "all" ? " active" : "")}

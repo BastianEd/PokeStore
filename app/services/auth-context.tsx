@@ -136,6 +136,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const updated = [...existing, nuevaCompra];
             localStorage.setItem(key, JSON.stringify(updated));
 
+            // Notificar al resto de la app que las ventas han cambiado (actualización en tiempo real del gráfico)
+            try {
+                const evt = new CustomEvent('ventas:actualizado', { detail: { userId: usuario.id, compra: nuevaCompra } });
+                window.dispatchEvent(evt);
+            } catch {}
+
             return nuevaCompra;
         } catch (error) {
             console.error("Error guardando compras locales:", error);

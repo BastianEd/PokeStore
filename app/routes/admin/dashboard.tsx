@@ -24,8 +24,8 @@ export default function AdminDashboard() {
       <div className="w-full max-w-5xl space-y-8">
 
         {/* Encabezado */}
-        <div className="flex items-end justify-between border-b border-gray-200 pb-6">
-          <div>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b border-gray-200 pb-6">
+          <div className="text-center md:text-left w-full">
             <h1 className="text-4xl font-extrabold text-gray-900 font-[var(--font-encabezados)]">
               Panel Admin
             </h1>
@@ -36,12 +36,12 @@ export default function AdminDashboard() {
         </div>
 
         {/* Tarjetas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center md:justify-items-stretch">
 
           {/* Inventario Pokémon */}
           <Link
             to="/admin/pokemons"
-            className="group block bg-white rounded-xl p-3 pb-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+            className="group block bg-white rounded-xl p-3 pb-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow w-full max-w-sm md:max-w-none"
           >
             <div className="flex items-start gap-4">
 
@@ -66,7 +66,7 @@ export default function AdminDashboard() {
           {/* Historial de Ventas */}
           <Link
             to="/admin/ventas"
-            className="group block bg-white rounded-xl p-3 pb-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+            className="group block bg-white rounded-xl p-3 pb-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow w-full max-w-sm md:max-w-none"
           >
             <div className="flex items-start gap-4">
 
@@ -89,7 +89,7 @@ export default function AdminDashboard() {
           {/* Gráficos */}
           <Link
             to="/admin/graficos"
-            className="group block bg-white rounded-xl p-3 pb-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+            className="group block bg-white rounded-xl p-3 pb-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow w-full max-w-sm md:max-w-none"
           >
             <div className="flex items-start gap-4">
               <div className="h-12 w-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
