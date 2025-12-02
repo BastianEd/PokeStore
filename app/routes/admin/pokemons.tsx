@@ -177,7 +177,6 @@ export default function AdminPokemons() {
                                             #{String(p.pokedexId).padStart(3, '0')}
                                         </td>
 
-                                        {/* IMAGEN GRANDE (Ajustada a tu gusto) */}
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center">
                                                 <div className="h-24 w-24 bg-white rounded-2xl border-2 border-gray-100 p-2 flex items-center justify-center shadow-sm group hover:border-blue-200 transition-colors">

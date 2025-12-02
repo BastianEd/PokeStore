@@ -34,6 +34,8 @@ export default function AdminVentas() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center pt-28 pb-12 px-4">
+      {/* Espaciador para separar del header fijo (patrón consistente) */}
+      <div className="w-full h-4 md:h-6 lg:h-6"></div>
       <div className="w-full max-w-6xl space-y-6">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 border-b border-gray-200 pb-4">
           <div>
@@ -48,7 +50,7 @@ export default function AdminVentas() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-b-lg border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-gray-50/80 border-b border-gray-100">

@@ -61,6 +61,19 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: var(--spacing-md);
 }
 
+/* Ajustes puntuales para el Panel Admin: reducir espacio entre título y descripción */
+.admin-dashboard .card-title {
+    margin-bottom: 0; /* anula margen inferior global del h2 en estas cards */
+}
+
+.admin-dashboard .card-desc {
+    margin-top: 0; /* evita separación extra encima del párrafo */
+}
+
+.admin-dashboard .text-block {
+    gap: 6px; /* pequeño espacio consistente entre título y descripción */
+}
+
 a {
     text-decoration: none;
     color: inherit;

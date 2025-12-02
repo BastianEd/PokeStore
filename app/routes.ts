@@ -12,4 +12,5 @@ export default [
     { path: "admin/dashboard", file: "routes/admin/dashboard.tsx" },
     { path: "admin/pokemons", file: "routes/admin/pokemons.tsx" },
     { path: "admin/ventas", file: "routes/admin/ventas.tsx" },
+    { path: "admin/graficos", file: "routes/admin/graficos.tsx" },
 ] satisfies RouteConfig;
