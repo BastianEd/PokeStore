@@ -3,20 +3,49 @@ import type { Pokemon } from "~/data/products";
 import { useCart } from "~/services/cart-context";
 import { useNotification } from "~/services/notification-context";
 
+/**
+ * @interface Props
+ * @description Define las propiedades para el componente `ProductCard`.
+ * @property {Pokemon} pokemon - El objeto Pokémon que se mostrará en la tarjeta.
+ * @property {(pokemon: Pokemon) => void} onView - Función callback que se ejecuta cuando el usuario hace clic en el botón "Ver ficha".
+ */
 interface Props {
     pokemon: Pokemon; // Renombrado de prop de product a pokemon
     onView: (pokemon: Pokemon) => void; // Renombrado de parámetro
 }
 
+/**
+ * @description Componente que renderiza una tarjeta de producto para un Pokémon específico.
+ *
+ * Esta tarjeta muestra información clave del Pokémon como su imagen, nombre, ID de Pokédex,
+ * tipo principal, una breve descripción y precio. Proporciona acciones para "capturar"
+ * (agregar al carrito) y para ver una ficha más detallada del Pokémon.
+ *
+ * Utiliza `useCart` para la lógica de agregar al carrito y `useNotification` para
+ * proporcionar feedback visual al usuario tras una captura exitosa.
+ *
+ * @param {Props} props - Las propiedades del componente, incluyendo el `pokemon` a mostrar y la función `onView`.
+ * @returns {React.ReactElement} Una tarjeta de producto interactiva para un Pokémon.
+ */
 export const ProductCard: FC<Props> = ({ pokemon, onView }) => {
     const { addToCart } = useCart();
     const { showNotification } = useNotification();
 
+    /**
+     * @description Maneja la acción de "capturar" un Pokémon.
+     * Agrega el Pokémon actual al carrito de compras y muestra una notificación
+     * de éxito para confirmar la acción al usuario.
+     */
     const handleAddToCart = () => {
         addToCart(pokemon as any); 
         showNotification(`¡${pokemon.nombre} capturado y agregado al carrito! ⚡️`);
     };
 
+    /**
+     * @description Formatea un valor numérico a una cadena de texto en formato de moneda chilena (CLP).
+     * @param {number} precio - El precio a formatear.
+     * @returns {string} El precio formateado como moneda.
+     */
     const formatearPrecio = (precio: number) => {
         return new Intl.NumberFormat("es-CL", {
             style: "currency",

@@ -2,8 +2,25 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "~/services/auth-context";
 
+/**
+ * @description Define los modos de operación para el panel de autenticación.
+ * Puede ser 'login' para iniciar sesión o 'register' para crear una nueva cuenta.
+ */
 type AuthMode = "login" | "register";
 
+/**
+ * @description Componente de panel de autenticación que maneja tanto el inicio de sesión como el registro de usuarios.
+ *
+ * Este componente es un "organismo" que encapsula toda la lógica y la interfaz de usuario para la autenticación.
+ * Se adapta dinámicamente según el `mode` proporcionado, mostrando los campos y textos apropiados
+ * para cada caso.
+ *
+ * Gestiona el estado interno del formulario, la comunicación con el servicio de autenticación (`useAuth`),
+ * y proporciona feedback al usuario a través de mensajes de estado (error, éxito, carga).
+ *
+ * @param {{ mode: AuthMode }} props - Las propiedades del componente, donde `mode` determina su comportamiento.
+ * @returns {React.ReactElement} Un panel de autenticación completo y funcional.
+ */
 export function AuthPanel({ mode }: { mode: AuthMode }) {
     const { login, register } = useAuth(); // Usamos las funciones reales del contexto
     const navigate = useNavigate();
@@ -20,6 +37,19 @@ export function AuthPanel({ mode }: { mode: AuthMode }) {
 
     const isLogin = mode === "login";
 
+    /**
+     * @description Maneja el envío del formulario de autenticación.
+     *
+     * Esta función asíncrona se encarga de:
+     * 1. Prevenir el comportamiento por defecto del formulario.
+     * 2. Realizar validaciones básicas en los campos.
+     * 3. Invocar la función `login` o `register` del contexto de autenticación, según el `mode`.
+     * 4. Gestionar el estado de carga (`loading`) para dar feedback visual.
+     * 5. Capturar y mostrar errores provenientes de la capa de servicio.
+     * 6. En caso de éxito, mostrar un mensaje y redirigir al usuario.
+     *
+     * @param {FormEvent<HTMLFormElement>} event - El evento de envío del formulario.
+     */
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);

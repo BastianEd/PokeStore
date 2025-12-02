@@ -1,6 +1,17 @@
 import { useAuth } from "~/services/auth-context";
 import { useNavigate } from "react-router";
 
+/**
+ * @description Componente que muestra la información del usuario actualmente autenticado y ofrece una opción para cerrar sesión.
+ *
+ * Este componente se integra con el `useAuth` hook para obtener los datos del `usuarioActual`.
+ * Si no hay un usuario en sesión, el componente no se renderiza (retorna `null`).
+ * Muestra el nombre, email y un rol legible del usuario ('Profesor Pokémon' para administradores, 'Entrenador' para otros).
+ * Incluye un botón "Salir" que invoca la función `logout` del contexto de autenticación y redirige
+ * al usuario a la página de login.
+ *
+ * @returns {React.ReactElement | null} El perfil del usuario o `null` si no hay sesión activa.
+ */
 export function UserProfile() {
     const { usuarioActual, logout } = useAuth();
     const navigate = useNavigate();
@@ -8,6 +19,11 @@ export function UserProfile() {
     // Si no hay usuario cargado, no mostramos el componente
     if (!usuarioActual) return null;
 
+    /**
+     * @description Maneja el proceso de cierre de sesión.
+     * Llama a la función `logout` del `auth-context` para limpiar el estado de autenticación
+     * y luego redirige al usuario a la página de login.
+     */
     const handleLogout = () => {
         logout();
         navigate("/login");

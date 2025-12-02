@@ -1,12 +1,27 @@
 import React from "react";
 import type { SaleRecord } from "~/services/sales.service";
 
+/**
+ * @interface TopSellingChartProps
+ * @description Define las propiedades para el componente `TopSellingChart`.
+ * @property {SaleRecord[]} sales - Un array de registros de ventas para analizar.
+ * @property {number} [top=5] - El número de Pokémon más vendidos a mostrar en el gráfico.
+ * @property {boolean} [showImages=true] - Determina si se deben mostrar las imágenes de los Pokémon en la leyenda.
+ */
 interface TopSellingChartProps {
   sales: SaleRecord[];
   top?: number; // cuantos mostrar
   showImages?: boolean; // ocultar imágenes para versión gráfica simple
 }
 
+/**
+ * @interface AggItem
+ * @description Representa un ítem de venta agregado, consolidando la cantidad total vendida por Pokémon.
+ * @property {number} pokedexId - El ID de Pokédex del Pokémon.
+ * @property {string} nombre - El nombre del Pokémon.
+ * @property {string} imagen - La URL de la imagen del Pokémon.
+ * @property {number} quantity - La cantidad total de unidades vendidas.
+ */
 interface AggItem {
   pokedexId: number;
   nombre: string;
@@ -14,6 +29,16 @@ interface AggItem {
   quantity: number;
 }
 
+/**
+ * @description Agrega los registros de ventas para calcular la cantidad total vendida por cada Pokémon.
+ *
+ * Esta función procesa un array de `SaleRecord`, iterando sobre los ítems de cada venta.
+ * Utiliza un `Map` para agrupar los ítems por `pokedexId` y sumar sus cantidades,
+ * resultando en una lista consolidada de ventas por Pokémon.
+ *
+ * @param {SaleRecord[]} sales - El array de registros de ventas a procesar.
+ * @returns {AggItem[]} Un array de ítems agregados, ordenado de mayor a menor cantidad vendida.
+ */
 function aggregateSales(sales: SaleRecord[]): AggItem[] {
   const map = new Map<number, AggItem>();
   for (const record of sales) {
@@ -29,6 +54,20 @@ function aggregateSales(sales: SaleRecord[]): AggItem[] {
 // Paleta fija (5 colores) - se puede extender
 const COLORS = ["#EF4444", "#F59E0B", "#3B82F6", "#10B981", "#8B5CF6"]; // rojo, amarillo, azul, verde, violeta
 
+/**
+ * @description Componente que visualiza los Pokémon más vendidos en un gráfico de torta y una leyenda detallada.
+ *
+ * Este componente toma una lista de registros de ventas, los agrega para determinar los más vendidos
+ * y renderiza una representación visual de los datos. El gráfico de torta (construido con SVG)
+ * muestra la proporción de ventas de cada Pokémon, mientras que la leyenda ofrece detalles
+ * como el nombre, la cantidad, el porcentaje de ventas y una barra de progreso.
+ *
+ * Es configurable para mostrar un número específico de los más vendidos (`top`) y para incluir
+ * o no las imágenes de los Pokémon (`showImages`).
+ *
+ * @param {TopSellingChartProps} props - Las propiedades para configurar el gráfico.
+ * @returns {React.ReactElement} Un componente de gráfico de ventas.
+ */
 export const TopSellingChart: React.FC<TopSellingChartProps> = ({ sales, top = 5, showImages = true }) => {
   const aggregated = aggregateSales(sales).slice(0, top);
   const total = aggregated.reduce((s, it) => s + it.quantity, 0);

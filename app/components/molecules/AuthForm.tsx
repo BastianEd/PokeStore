@@ -2,10 +2,31 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "~/services/auth-context";
 
+/**
+ * @interface AuthFormProps
+ * @description Define las propiedades para el componente `AuthForm`.
+ * @property {"login" | "register"} mode - Determina si el formulario se renderiza para iniciar sesión o para registrar un nuevo usuario.
+ */
 interface AuthFormProps {
     mode: "login" | "register";
 }
 
+/**
+ * @description Componente de formulario para autenticación de usuarios, con modos para "login" y "register".
+ *
+ * Este componente gestiona el estado de los campos del formulario (nombre, email, contraseña),
+ * el estado de carga durante la sumisión, y la visualización de errores. Utiliza el hook `useAuth`
+ * para acceder a las funciones de `login` y `register`, encapsulando la lógica de autenticación.
+ *
+ * El formulario se adapta dinámicamente según el `mode` proporcionado:
+ * - En modo "login", muestra campos para email y contraseña.
+ * - En modo "register", añade un campo para el nombre.
+ *
+ * Tras una operación exitosa, redirige al usuario a la página principal.
+ *
+ * @param {AuthFormProps} props - Propiedades del componente, principalmente el `mode`.
+ * @returns {React.ReactElement} Un formulario de autenticación interactivo.
+ */
 export function AuthForm({ mode }: AuthFormProps) {
     const navigate = useNavigate();
     const { login, register } = useAuth(); // <--- Accedemos a las funciones reales
@@ -18,6 +39,13 @@ export function AuthForm({ mode }: AuthFormProps) {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
+    /**
+     * @description Maneja el envío del formulario.
+     * Previene el comportamiento por defecto, gestiona el estado de carga,
+     * invoca la función de `login` o `register` según el modo,
+     * y maneja los errores de la operación.
+     * @param {FormEvent<HTMLFormElement>} event - El evento del formulario.
+     */
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
