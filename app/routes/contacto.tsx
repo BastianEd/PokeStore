@@ -1,9 +1,28 @@
+/**
+ * @description Genera los metadatos para la página de contacto.
+ * Esta función es utilizada por el framework de enrutamiento para establecer la etiqueta `<title>`
+ * en el `<head>` del documento, lo cual es importante para el SEO y la experiencia del usuario.
+ *
+ * @returns {Array<Object>} Un array de objetos de metadatos.
+ */
 export function meta() {
     return [
         { title: "Contacto - Pokémon Trading Co." },
     ];
 }
 
+/**
+ * @description Componente que renderiza la página de contacto estática.
+ *
+ * Esta página presenta la información de contacto de la empresa y un formulario para que los usuarios
+ * puedan enviar mensajes. El diseño se divide en dos columnas: un formulario a la izquierda y
+ * la información de contacto (dirección, teléfono, email, horarios) y preguntas frecuentes a la derecha.
+ *
+ * Es importante destacar que, en su implementación actual, el formulario es puramente visual
+ * y no incluye lógica de envío de datos (`onSubmit`). Su propósito es servir como una plantilla de UI.
+ *
+ * @returns {React.ReactElement} La sección de contacto con el formulario y la información.
+ */
 export default function Contacto() {
     return (
         <section id="contacto" className="section active">

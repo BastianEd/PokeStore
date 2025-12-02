@@ -5,10 +5,29 @@ import { useNavigate } from "react-router";
 import { SalesService, type SaleRecord } from "~/services/sales.service";
 import TopSellingChart from "~/components/molecules/TopSellingChart";
 
+/**
+ * @description Genera los metadatos para la página de gráficos de ventas.
+ * @param {Route.MetaArgs} args - Argumentos proporcionados por el enrutador.
+ * @returns {Array<Object>} Un array de objetos de metadatos para el `<head>` del documento.
+ */
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Gráficos de Ventas" }];
 }
 
+/**
+ * @description Componente que renderiza la página de visualización de gráficos de ventas para administradores.
+ *
+ * Esta página está protegida y solo es accesible para usuarios con rol de administrador.
+ * Sus responsabilidades principales son:
+ * - **Cargar datos de ventas**: Utiliza `SalesService` para obtener todos los registros de ventas.
+ * - **Actualización en tiempo real**: Implementa un listener para el evento global `ventas:actualizado`.
+ *   Esto permite que el gráfico se actualice automáticamente cuando se registra una nueva venta en otra
+ *   parte de la aplicación, sin necesidad de recargar la página.
+ * - **Visualización de datos**: Pasa los datos de ventas al componente `TopSellingChart` para
+ *   renderizar un gráfico de los Pokémon más vendidos.
+ *
+ * @returns {React.ReactElement | null} La interfaz de gráficos o `null` si el usuario no es administrador.
+ */
 export default function AdminGraficos() {
   const { isAdmin, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -16,10 +35,12 @@ export default function AdminGraficos() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Efecto para proteger la ruta, redirigiendo si el usuario no es admin.
   useEffect(() => {
     if (!isLoading && !isAdmin) navigate("/");
   }, [isAdmin, isLoading, navigate]);
 
+  // Efecto para la carga inicial de datos de ventas.
   useEffect(() => {
     if (!isAdmin) return;
     setLoading(true);
@@ -31,6 +52,11 @@ export default function AdminGraficos() {
       .finally(() => setLoading(false));
   }, [isAdmin]);
 
+  /**
+   * @description Efecto que suscribe el componente a un evento personalizado para actualizar los datos de ventas.
+   * Este patrón de diseño permite que el componente reaccione a cambios en los datos (ej. una nueva venta)
+   * que ocurren en otras partes de la aplicación, desacoplando la lógica de actualización.
+   */
   // Escuchar evento personalizado para refrescar ventas sin recargar la página
   useEffect(() => {
     if (!isAdmin) return;

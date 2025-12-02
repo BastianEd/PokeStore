@@ -5,6 +5,14 @@ import { ProductCard } from "~/components/molecules/ProductCard";
 import { ProductModal } from "~/components/organisms/ProductModal";
 import { Link } from "react-router";
 
+/**
+ * @description Genera los metadatos para la página de inicio.
+ * Esta función es crucial para el SEO, estableciendo el título y la descripción
+ * que aparecerán en los resultados de búsqueda y en la pestaña del navegador.
+ *
+ * @param {Route.MetaArgs} args - Argumentos proporcionados por el enrutador.
+ * @returns {Array<Object>} Un array de objetos de metadatos.
+ */
 export function meta({}: Route.MetaArgs) {
     return [
         {
@@ -18,6 +26,18 @@ export function meta({}: Route.MetaArgs) {
     ];
 }
 
+/**
+ * @description Componente que renderiza la página de inicio o "landing page" de la aplicación.
+ *
+ * Esta página sirve como la principal puerta de entrada para los usuarios. Sus responsabilidades son:
+ * - **Presentar la Propuesta de Valor**: A través de una sección "hero" que destaca las características clave de la tienda.
+ * - **Mostrar Productos Destacados**: Filtra y muestra una selección de "Pokémon de la Semana" para atraer el interés del usuario.
+ * - **Gestionar la Interacción del Modal**: Controla la lógica para abrir un modal con la vista detallada de un Pokémon
+ *   cuando el usuario interactúa con una `ProductCard`. Utiliza el estado local para manejar la visibilidad (`modalOpen`)
+ *   y el contenido (`selectedPokemon`) del modal.
+ *
+ * @returns {React.ReactElement} La página de inicio completa.
+ */
 export default function Home() {
     // Usar Pokemons Destacados
     const pokemonsDestacados = POKEMONS.filter((p) => p.destacado).slice(0, 4);
@@ -26,11 +46,20 @@ export default function Home() {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
 
+    /**
+     * @description Manejador para abrir el modal de vista de producto.
+     * Esta función se pasa como prop `onView` a cada `ProductCard`.
+     * @param {Pokemon} pokemon - El objeto Pokémon seleccionado por el usuario.
+     */
     const handleViewPokemon = (pokemon: Pokemon) => {
         setSelectedPokemon(pokemon);
         setModalOpen(true);
     };
 
+    /**
+     * @description Manejador para cerrar el modal de vista de producto.
+     * Restablece el estado para ocultar el modal y limpiar la selección.
+     */
     const handleCloseModal = () => {
         setModalOpen(false);
         setSelectedPokemon(null);

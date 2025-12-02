@@ -5,10 +5,30 @@ import { useAuth } from "~/services/auth-context";
 import { useState, useRef, useEffect } from "react";
 import { FiShoppingCart } from "react-icons/fi";
 
+/**
+ * @description Genera los metadatos para la página del carrito de compras.
+ * @param {Route.MetaArgs} args - Argumentos proporcionados por el enrutador.
+ * @returns {Array<Object>} Un array de objetos de metadatos para el `<head>` del documento.
+ */
 export function meta({}: Route.MetaArgs) {
     return [{ title: "Carrito de Captura - Pokémon Trading Co." }];
 }
 
+/**
+ * @description Componente que renderiza la página del carrito de compras.
+ *
+ * Esta página gestiona el ciclo de vida completo de una compra. Sus responsabilidades incluyen:
+ * - **Visualización del Carrito**: Muestra los Pokémon agregados, sus cantidades y subtotales, utilizando datos del `useCart` hook.
+ * - **Gestión de Estado Vacío**: Presenta un mensaje amigable si el carrito no contiene ítems.
+ * - **Proceso de Compra**: Orquesta la lógica de "comprar", que implica:
+ *   1. Persistir la compra en el historial del usuario a través del `useAuth` hook (`agregarCompras`).
+ *   2. Limpiar el carrito (`clearCart`) después de una compra exitosa.
+ *   3. Simular la generación de una boleta con un estado de carga (`isReceiptLoading`) para mejorar la experiencia de usuario.
+ *   4. Mostrar una boleta modal (`lastPurchase`) con el resumen de la compra finalizada.
+ * - **Gestión de Efectos Secundarios**: Utiliza `useEffect` para limpiar temporizadores (`setTimeout`) si el componente se desmonta, previniendo memory leaks.
+ *
+ * @returns {React.ReactElement} La interfaz del carrito de compras, que se adapta a diferentes estados (vacío, con ítems, cargando boleta, mostrando boleta).
+ */
 export default function CartPage() {
     const { items, totalItems, totalPrice, removeFromCart, clearCart } = useCart();
     const { showNotification } = useNotification();
@@ -17,6 +37,8 @@ export default function CartPage() {
     const [isReceiptLoading, setIsReceiptLoading] = useState(false);
     const timeoutRef = useRef<number | null>(null);
 
+    // Hook de efecto para limpiar el temporizador si el componente se desmonta.
+    // Es una buena práctica de manejo de memoria para evitar ejecuciones de `setTimeout` en componentes que ya no existen.
     useEffect(() => {
         return () => {
             if (timeoutRef.current) {

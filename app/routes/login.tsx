@@ -3,6 +3,16 @@ import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 import { useAuth } from "~/services/auth-context";
 
+/**
+ * @description Genera los metadatos para la página de login.
+ *
+ * Esta función es utilizada por el framework de enrutamiento para establecer las etiquetas `<title>` y `<meta name="description">`
+ * en el `<head>` del documento HTML. Esto es crucial para el SEO y para proporcionar contexto al usuario
+ * en la pestaña del navegador.
+ *
+ * @param {Route.MetaArgs} args - Argumentos proporcionados por el enrutador, que pueden incluir datos del cargador, parámetros, etc.
+ * @returns {Array<Object>} Un array de objetos de metadatos.
+ */
 export function meta({}: Route.MetaArgs) {
     return [
         { title: "Acceso de Entrenadores - Pokémon Trading Co." },
@@ -13,12 +23,34 @@ export function meta({}: Route.MetaArgs) {
     ];
 }
 
+/**
+ * @description Componente que renderiza la página de inicio de sesión.
+ *
+ * Este componente presenta un formulario para que los usuarios se autentiquen.
+ * Gestiona el estado del formulario, incluyendo la entrada del usuario, el estado de carga
+ * durante la sumisión y la visualización de mensajes de error.
+ *
+ * Utiliza el `useAuth` hook para acceder a la lógica de autenticación y `useNavigate`
+ * para redirigir al usuario a la página principal después de un inicio de sesión exitoso.
+ *
+ * @returns {React.ReactElement} La página de login con su formulario y elementos de UI adicionales.
+ */
 export default function LoginPage() {
     const { login } = useAuth();
     const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
+    /**
+     * @description Manejador para el evento de envío del formulario de login.
+     *
+     * Orquesta el proceso de autenticación del usuario. Extrae las credenciales del
+     * evento del formulario, realiza una validación básica, y luego invoca la función `login`
+     * del contexto de autenticación. Gestiona los estados de carga y error para proporcionar
+     * feedback visual al usuario. En caso de éxito, redirige al usuario a la ruta raíz.
+     *
+     * @param {React.FormEventHandler<HTMLFormElement>} e - El evento del formulario.
+     */
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);

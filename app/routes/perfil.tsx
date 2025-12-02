@@ -3,6 +3,11 @@ import { Navigate } from "react-router";
 import { useAuth } from "~/services/auth-context";
 import { useEffect, useState } from "react";
 
+/**
+ * @description Genera los metadatos para la página de perfil del usuario.
+ * @param {Route.MetaArgs} args - Argumentos proporcionados por el enrutador.
+ * @returns {Array<Object>} Un array de objetos de metadatos para el `<head>` del documento.
+ */
 export function meta({}: Route.MetaArgs) {
     return [
         { title: "Mi Perfil - PokeStore" },
@@ -13,6 +18,18 @@ export function meta({}: Route.MetaArgs) {
     ];
 }
 
+/**
+ * @description Componente que renderiza la página de perfil del usuario autenticado.
+ *
+ * Esta página está protegida y solo es accesible para usuarios que han iniciado sesión.
+ * - **Protección de Ruta**: Si no hay un `usuarioActual` en el contexto de autenticación,
+ *   el componente redirige automáticamente a la página de `/login`.
+ * - **Visualización de Datos**: Muestra la información del usuario (ID, email, roles) obtenida del `useAuth` hook.
+ *   Incluye una lógica para transformar los nombres técnicos de los roles (ej. 'admin') en etiquetas más amigables.
+ * - **Historial de Compras**: Renderiza el componente `PurchaseHistory` para mostrar las compras pasadas del usuario.
+ *
+ * @returns {React.ReactElement} La página de perfil del usuario o un componente `Navigate` para redirigir.
+ */
 export default function PerfilPage() {
     const { usuarioActual } = useAuth();
 
@@ -78,6 +95,21 @@ export default function PerfilPage() {
     );
 }
 
+/**
+ * @description Subcomponente que muestra el historial de compras de un usuario específico.
+ *
+ * Este componente es responsable de leer y renderizar el historial de compras, que para esta
+ * aplicación de demostración se almacena en el `localStorage` del navegador.
+ *
+ * - **Carga de Datos**: Utiliza `useEffect` para acceder al `localStorage` de forma segura
+ *   (solo en el lado del cliente) y obtener los datos de la clave `compras_user_${usuarioId}`.
+ * - **Renderizado Condicional**: Muestra un mensaje indicando que no hay compras si el historial está vacío.
+ * - **Visualización**: Si existen compras, las renderiza en orden cronológico inverso, mostrando
+ *   los detalles de cada transacción.
+ *
+ * @param {{ usuarioId: number }} props - Las propiedades del componente, incluyendo el ID del usuario.
+ * @returns {React.ReactElement} Una lista del historial de compras del usuario.
+ */
 function PurchaseHistory({ usuarioId }: { usuarioId: number }) {
     const [compras, setCompras] = useState<Array<any>>([]);
 

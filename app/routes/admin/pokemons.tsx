@@ -8,6 +8,11 @@ import { FiEdit2, FiTrash2, FiSave, FiX, FiPlus } from "react-icons/fi";
 import { useNotification } from "~/services/notification-context"; 
 import { Link } from "react-router";
 
+/**
+ * @description Genera los metadatos para la página de administración de Pokémon.
+ * @param {Route.MetaArgs} args - Argumentos proporcionados por el enrutador.
+ * @returns {Array<Object>} Un array de objetos de metadatos para el `<head>` del documento.
+ */
 export function meta({}: Route.MetaArgs) {
     return [{ title: "Administración de Pokemones" }];
 }
@@ -15,6 +20,19 @@ export function meta({}: Route.MetaArgs) {
 // Estilo base para los botones pequeños
 const btnActionStyle = "p-2 rounded-full transition-colors shadow-sm hover:shadow-md";
 
+/**
+ * @description Componente principal para la página de administración del inventario de Pokémon.
+ *
+ * Este componente implementa una interfaz de tipo CRUD (Crear, Leer, Actualizar, Eliminar)
+ * para la gestión de Pokémon. Incluye las siguientes funcionalidades clave:
+ * - **Protección de Ruta**: Utiliza el hook `useAuth` para asegurar que solo los usuarios con rol de administrador puedan acceder.
+ * - **Carga de Datos**: Obtiene la lista de Pokémon del `ProductService` y la muestra en una tabla.
+ * - **Edición en Línea**: Permite la modificación directa de los datos de un Pokémon en la misma fila de la tabla.
+ * - **Operaciones CRUD**: Implementa la lógica para `seed` (crear), `update` y `delete` a través del `ProductService`.
+ * - **Notificaciones**: Proporciona feedback al usuario sobre el resultado de las operaciones mediante `useNotification`.
+ *
+ * @returns {React.ReactElement | null} La interfaz de administración o `null` si el usuario no es administrador.
+ */
 export default function AdminPokemons() {
     const { isAdmin, isLoading } = useAuth();
     const navigate = useNavigate();
@@ -39,6 +57,11 @@ export default function AdminPokemons() {
         if (isAdmin) loadData();
     }, [isAdmin]);
 
+    /**
+     * @description Carga o recarga los datos de los Pokémon desde el servicio.
+     * Gestiona el estado de carga y actualiza el estado del componente con los datos obtenidos.
+     * Los datos se ordenan por `pokedexId` para mantener un orden consistente.
+     */
     const loadData = async () => {
         setLoadingData(true);
         try {
@@ -54,6 +77,10 @@ export default function AdminPokemons() {
 
     // --- ACCIONES DEL CRUD ---
 
+    /**
+     * @description Invoca la función `seed` del servicio para poblar la base de datos con nuevos Pokémon.
+     * Muestra una notificación de éxito al completarse.
+     */
     // POST /seed
     const handleAdd = async () => {
         try {
@@ -69,6 +96,12 @@ export default function AdminPokemons() {
         }
     };
 
+    /**
+     * @description Elimina un Pokémon del inventario por su ID.
+     * Pide confirmación al usuario antes de proceder. Actualiza el estado local para reflejar la eliminación
+     * y muestra una notificación.
+     * @param {number} id - El ID del Pokémon a eliminar.
+     */
     // DELETE /{id}
     const handleDelete = async (id: number) => {
         if (!confirm("¿Estás seguro de liberar a este Pokémon? No podrás deshacerlo.")) return;
@@ -84,6 +117,11 @@ export default function AdminPokemons() {
         }
     };
 
+    /**
+     * @description Inicia el modo de edición para una fila específica de la tabla.
+     * Establece el `editingId` y pre-carga el formulario de edición con los datos actuales del Pokémon.
+     * @param {Pokemon} p - El objeto Pokémon que se va a editar.
+     */
     // PATCH (Inicio de edición)
     const startEdit = (p: Pokemon) => {
         setEditingId(p.pokedexId);
@@ -95,6 +133,12 @@ export default function AdminPokemons() {
         });
     };
 
+    /**
+     * @description Guarda los cambios realizados en el formulario de edición.
+     * Invoca el método `update` del servicio y, si tiene éxito, sale del modo de edición,
+     * recarga los datos y muestra una notificación.
+     * @param {number} id - El ID del Pokémon que se está guardando.
+     */
     // PATCH (Guardar cambios)
     const saveEdit = async (id: number) => {
         try {

@@ -4,20 +4,44 @@ import { useAuth } from "~/services/auth-context";
 import { useNavigate } from "react-router";
 import { SalesService, type SaleRecord } from "~/services/sales.service";
 
+/**
+ * @description Genera los metadatos para la página de historial de ventas.
+ * @param {Route.MetaArgs} args - Argumentos proporcionados por el enrutador.
+ * @returns {Array<Object>} Un array de objetos de metadatos para el `<head>` del documento.
+ */
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Historial de Ventas" }];
 }
 
+/**
+ * @description Componente que renderiza la página del historial de ventas para administradores.
+ *
+ * Esta página está protegida y solo es accesible para usuarios con rol de administrador.
+ * Su función principal es mostrar un registro detallado de todas las transacciones de venta
+ * realizadas en la tienda.
+ *
+ * Funcionalidades clave:
+ * - **Protección de Ruta**: Asegura que solo los administradores puedan ver esta información sensible.
+ * - **Carga de Datos**: Al montar el componente, obtiene todos los registros de ventas a través de `SalesService`.
+ * - **Cálculo Eficiente**: Utiliza el hook `useMemo` para calcular el total recaudado de todas las ventas,
+ *   optimizando el rendimiento al evitar recálculos innecesarios en cada render.
+ * - **Visualización en Tabla**: Presenta los datos de forma clara y estructurada en una tabla,
+ *   mostrando detalles de cada venta como ID, fecha, usuario y total.
+ *
+ * @returns {React.ReactElement | null} La interfaz del historial de ventas o `null` si el usuario no es administrador.
+ */
 export default function AdminVentas() {
   const { isAdmin, isLoading } = useAuth();
   const navigate = useNavigate();
   const [ventas, setVentas] = useState<SaleRecord[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Efecto para proteger la ruta, redirigiendo si el usuario no es admin.
   useEffect(() => {
     if (!isLoading && !isAdmin) navigate("/");
   }, [isAdmin, isLoading, navigate]);
 
+  // Efecto para la carga inicial de datos de ventas.
   useEffect(() => {
     if (!isAdmin) return;
     setLoading(true);
@@ -26,6 +50,12 @@ export default function AdminVentas() {
       .finally(() => setLoading(false));
   }, [isAdmin]);
 
+  /**
+   * @description Calcula el total recaudado de todas las ventas utilizando `useMemo`.
+   * Este hook memoriza el resultado del cálculo, y solo lo vuelve a ejecutar si la dependencia `ventas` cambia.
+   * Esto previene cálculos costosos en cada re-renderizado del componente, mejorando la eficiencia.
+   * @returns {number} El monto total recaudado.
+   */
   const totalRecaudado = useMemo(() => {
     return ventas.reduce((sum, v) => sum + v.items.reduce((s, it) => s + it.precio * it.quantity, 0), 0);
   }, [ventas]);

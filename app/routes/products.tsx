@@ -1,16 +1,37 @@
 import type { Route } from "./+types/products";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router";
-// Ya no importamos POKEMONS estático, solo los tipos
 import { TIPOS, type Pokemon } from "~/data/products";
 import { ProductCard } from "~/components/molecules/ProductCard";
 import { ProductModal } from "~/components/organisms/ProductModal";
-import { ProductService } from "~/services/product.service"; // Importamos el servicio
+import { ProductService } from "~/services/product.service";
 
+/**
+ * @description Genera los metadatos para la página del listado de productos (Pokédex).
+ * @param {Route.MetaArgs} args - Argumentos proporcionados por el enrutador.
+ * @returns {Array<Object>} Un array de objetos de metadatos para el `<head>` del documento.
+ */
 export function meta({}: Route.MetaArgs) {
     return [{ title: "Pokédex de Venta - Pokémon Trading Co." }];
 }
 
+/**
+ * @description Componente que renderiza la página principal de listado de productos (Pokédex).
+ *
+ * Esta página es el catálogo central de la tienda. Sus responsabilidades son:
+ * - **Carga de Datos Asíncrona**: Utiliza `useEffect` para obtener la lista completa de Pokémon
+ *   desde un backend a través del `ProductService` al montar el componente.
+ * - **Gestión de Estados de Carga y Error**: Muestra indicadores visuales mientras los datos se cargan
+ *   o si ocurre un error durante la obtención de los mismos.
+ * - **Filtrado y Búsqueda**: Permite a los usuarios filtrar los Pokémon por tipo y buscar por nombre o ID.
+ *   La lógica de filtrado está optimizada con `useMemo` para evitar recálculos innecesarios.
+ * - **Sincronización con URL**: Lee los parámetros de búsqueda de la URL (`?q=...`), permitiendo
+ *   que los resultados de búsqueda sean compartibles.
+ * - **Interacción con Modal**: Gestiona la apertura de un modal de vista detallada (`ProductModal`)
+ *   cuando un usuario hace clic en una `ProductCard`.
+ *
+ * @returns {React.ReactElement} La página de listado de productos con filtros y la cuadrícula de Pokémon.
+ */
 export default function Productos() {
     const [products, setProducts] = useState<Pokemon[]>([]); // Estado para los productos
     const [loading, setLoading] = useState(true); // Estado de carga
@@ -42,16 +63,28 @@ export default function Productos() {
         fetchProducts();
     }, []);
 
+    /**
+     * @description Manejador para abrir el modal de vista de producto.
+     * @param {Pokemon} pokemon - El Pokémon seleccionado.
+     */
     const handleViewPokemon = (pokemon: Pokemon) => {
         setSelectedPokemon(pokemon);
         setModalOpen(true);
     };
 
+    /**
+     * @description Manejador para cerrar el modal de vista de producto.
+     */
     const handleCloseModal = () => {
         setModalOpen(false);
         setSelectedPokemon(null);
     };
 
+    /**
+     * @description Memoriza la lista de Pokémon filtrados para optimizar el rendimiento.
+     * El recálculo solo se ejecuta si cambian los productos, el término de búsqueda o el tipo seleccionado.
+     * @returns {Pokemon[]} La lista de Pokémon que coincide con los criterios de filtro y búsqueda.
+     */
     // Lógica de filtrado (ahora usa el estado 'products' en vez de la constante POKEMONS)
     const pokemonsFiltrados = useMemo(() => {
         return products.filter((p) => {
@@ -83,6 +116,7 @@ export default function Productos() {
         });
     }, [products, search, tipoSeleccionado, location.search]);
 
+    // Efecto para sincronizar el estado de búsqueda con el parámetro 'q' de la URL.
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const q = params.get("q") || "";

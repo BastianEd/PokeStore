@@ -3,6 +3,16 @@ import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 import { useAuth } from "~/services/auth-context";
 
+/**
+ * @description Genera los metadatos para la página de registro.
+ *
+ * Esta función es utilizada por el framework de enrutamiento para definir las etiquetas `<title>` y `<meta name="description">`
+ * en el `<head>` del documento. Es fundamental para el SEO y para mejorar la experiencia del usuario
+ * al proporcionar un título claro en la pestaña del navegador.
+ *
+ * @param {Route.MetaArgs} args - Argumentos proporcionados por el enrutador.
+ * @returns {Array<Object>} Un array de objetos que representan las etiquetas meta.
+ */
 export function meta({}: Route.MetaArgs) {
     return [
         { title: "Registro de Entrenadores - Pokémon Trading Co." },
@@ -13,12 +23,34 @@ export function meta({}: Route.MetaArgs) {
     ];
 }
 
+/**
+ * @description Componente que renderiza la página de registro de nuevos usuarios.
+ *
+ * Este componente presenta un formulario para que los nuevos usuarios creen una cuenta.
+ * Se encarga de gestionar el estado de los campos del formulario, las validaciones del lado del cliente
+ * (como la confirmación de contraseña), el estado de carga durante el envío y la visualización de errores.
+ *
+ * Utiliza el hook `useAuth` para acceder a la función `register` y `useNavigate` para redirigir
+ * al usuario a la página principal tras un registro exitoso.
+ *
+ * @returns {React.ReactElement} La página de registro con su formulario y contenido informativo.
+ */
 export default function RegisterPage() {
     const { register } = useAuth();
     const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
+    /**
+     * @description Manejador para el evento de envío del formulario de registro.
+     *
+     * Orquesta el proceso de creación de una nueva cuenta. Extrae los datos del formulario,
+     * ejecuta validaciones (campos obligatorios, longitud de contraseña, coincidencia de contraseñas),
+     * y si son exitosas, invoca la función `register` del contexto de autenticación.
+     * Gestiona los estados de carga y error para dar feedback al usuario.
+     *
+     * @param {React.FormEventHandler<HTMLFormElement>} e - El evento del formulario.
+     */
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);

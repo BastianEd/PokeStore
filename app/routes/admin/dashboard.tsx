@@ -3,18 +3,38 @@ import { useEffect } from "react";
 import { useAuth } from "~/services/auth-context";
 import { useNavigate, Link } from "react-router";
 
+/**
+ * @description Genera los metadatos para la página del panel de administración.
+ * @param {Route.MetaArgs} args - Argumentos proporcionados por el enrutador.
+ * @returns {Array<Object>} Un array de objetos de metadatos para el `<head>` del documento.
+ */
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Panel de Administración" }];
 }
 
+/**
+ * @description Componente que renderiza el panel de control principal para administradores.
+ *
+ * Esta página actúa como el punto de entrada y centro de navegación para todas las
+ * funcionalidades de administración de la tienda. Sus responsabilidades clave son:
+ * - **Protección de Ruta**: Utiliza el hook `useAuth` para verificar si el usuario
+ *   tiene permisos de administrador. Si no es así, o si la sesión aún no se ha cargado,
+ *   redirige al usuario a la página de inicio para prevenir el acceso no autorizado.
+ * - **Navegación**: Presenta una serie de tarjetas de enlace que dirigen a las
+ *   diferentes secciones de gestión: Inventario de Pokémon, Historial de Ventas y Gráficos.
+ *
+ * @returns {React.ReactElement | null} La interfaz del panel de administración o `null` si el usuario no tiene los permisos necesarios.
+ */
 export default function AdminDashboard() {
   const { isAdmin, isLoading } = useAuth();
   const navigate = useNavigate();
 
+  // Efecto para proteger la ruta, redirigiendo si el usuario no es admin.
   useEffect(() => {
     if (!isLoading && !isAdmin) navigate("/");
   }, [isAdmin, isLoading, navigate]);
 
+  // Renderiza null mientras se verifica el estado de autenticación para evitar un parpadeo de contenido.
   if (!isAdmin) return null;
 
   return (
